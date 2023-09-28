@@ -1,0 +1,13 @@
+{
+  "name": "silentlagoon/game",
+  "require": {
+    "php": "^8.1.10"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": [
+        "src/"
+      ]
+    }
+  }
+}
