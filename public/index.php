@@ -1,6 +1,5 @@
 <?php
 
-
 if (!function_exists('dd')) {
     function dd(mixed ...$vars): never
     {
@@ -20,27 +19,24 @@ if (!function_exists('dump')) {
     }
 }
 
-use App\Entities\Living\Humans\Worker;
+use App\Digestor;
+use App\Entities\EntitiesFactory;
+use App\Game;
 use App\Periods\TimesOfYear;
+use App\Profile\Profile;
 
 require __DIR__.'/../vendor/autoload.php';
 
-$timesOfYear = new TimesOfYear();
-$entities = [new Worker()];
+$userName = readline('Enter your username: ');
+$settlementName = readline('Enter your settlement name: ');
 
-$currentYear = 1;
+$profile = new Profile();
+$profile->setUserName($userName)
+    ->setSettlementName($settlementName)
+    ->addStartingGoldAmount();
 
-while (true) {
+$digestor = new Digestor([], new TimesOfYear(), 1);
+$entitiesFactory = new EntitiesFactory();
 
-    foreach ($entities as $entity) {
-        $yearResult = $entity->digestPeriod($timesOfYear->getCurrentPeriod());
-        dump($yearResult);
-
-        if ($entity->isDead()) {
-            dd(sprintf('%s has died this %s, on Year: %d', $entity->getName(), $timesOfYear->getCurrentPeriod()->getName(), $currentYear));
-        }
-    }
-
-    $timesOfYear->moveToNextPeriod();
-    $currentYear++;
-}
+$game = new Game($profile, $digestor, $entitiesFactory);
+$game->start();

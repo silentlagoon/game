@@ -8,7 +8,8 @@ abstract class BasePeriod implements IPeriod
 {
     protected string $name;
     protected array $healValueRanges = [];
-    protected array $damageValuesRanges = [];
+    protected array $damageValueRanges = [];
+    protected array $collapseValueRanges = [];
 
     public function getNatureHealing(): int
     {
@@ -17,7 +18,12 @@ abstract class BasePeriod implements IPeriod
 
     public function getNatureDamage(): int
     {
-        return $this->calculateChangeOfRange($this->damageValuesRanges);
+        return $this->calculateChangeOfRange($this->damageValueRanges);
+    }
+
+    public function getCollapseDamage(): int
+    {
+        return $this->calculateChangeOfRange($this->collapseValueRanges);
     }
 
     public function getName(): string

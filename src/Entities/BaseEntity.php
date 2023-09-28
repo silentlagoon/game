@@ -3,7 +3,9 @@
 namespace App\Entities;
 
 use App\Entities\Contracts\IEntity;
+use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\Periods\Contracts\IPeriod;
+use App\Profile\Profile;
 
 abstract class BaseEntity implements IEntity
 {
@@ -11,15 +13,47 @@ abstract class BaseEntity implements IEntity
 
     protected bool $canBeDamagedByNature;
     protected bool $canBeHealedByNature;
+    protected bool $canCollapse;
+
+    protected int $earnsGoldPerPeriod = 0;
 
     protected int $maxHitPoints;
     protected int $currentHitPoints;
 
-    public function digestPeriod(IPeriod $period): array
+    protected int $entityCost = 0;
+
+    /**
+     * @param Profile $profile
+     * @throws NotEnoughGoldToSpendException
+     */
+    public function __construct(Profile $profile)
+    {
+        $profile->spendGoldAmount($this->entityCost);
+    }
+
+    public function digestPeriod(IPeriod $period, Profile $profile): array
     {
         $natureDamage = $this->processNatureDamage($period);
+        $collapseDamage = $this->processCollapseDamage($period);
+        $earnings = $this->processEarnings($period);
 
-        return $natureDamage;
+        if ($earnings > 0) {
+            $profile->addGoldAmount($earnings);
+        }
+
+        return compact('natureDamage', 'collapseDamage');
+    }
+
+    protected function processCollapseDamage(IPeriod $period): array
+    {
+        $damageReceived = $period->getCollapseDamage();
+
+        if ($this->canCollapse) {
+            $this->receiveDamage($period->getCollapseDamage());
+        }
+
+        $resultHitPoints = sprintf('%s / %s', $this->getCurrentHitPoints(), $this->getMaxHitPoints());
+        return compact('damageReceived', 'resultHitPoints');
     }
 
     /**
@@ -42,6 +76,17 @@ abstract class BaseEntity implements IEntity
         $resultHitPoints = sprintf('%s / %s', $this->getCurrentHitPoints(), $this->getMaxHitPoints());
 
         return compact('damageReceived', 'damageHealed', 'resultHitPoints');
+    }
+
+    protected function processEarnings(IPeriod $period): int
+    {
+        $totalEarnings = 0;
+
+        if ($this->earnsGoldPerPeriod > 0) {
+            $totalEarnings += $this->earnsGoldPerPeriod;
+        }
+
+        return $totalEarnings;
     }
 
     public function getCurrentHitPoints(): int
@@ -79,5 +124,15 @@ abstract class BaseEntity implements IEntity
     public function getName(): string
     {
         return $this->name ?? (new \ReflectionClass($this))->getShortName();
+    }
+
+    public function setName($name): void
+    {
+        $this->name = ucfirst($name);
+    }
+
+    public function getEntityCost(): int
+    {
+        return $this->entityCost;
     }
 }

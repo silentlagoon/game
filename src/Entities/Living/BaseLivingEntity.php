@@ -8,4 +8,5 @@ class BaseLivingEntity extends BaseEntity
 {
     protected bool $canBeDamagedByNature = true;
     protected bool $canBeHealedByNature = true;
+    protected bool $canCollapse = false;
 }
