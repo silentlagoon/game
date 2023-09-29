@@ -29,12 +29,13 @@ class TimesOfYear
     {
         $currentPeriods = $this->getPeriods();
         $nextPeriodKey = array_search($this->currentPeriod, $currentPeriods) + 1;
+
         if (isset($currentPeriods[$nextPeriodKey])) {
             return $this->currentPeriod = $currentPeriods[$nextPeriodKey];
         }
 
         $this->incrementYear();
-        return reset($currentPeriods);
+        return $this->currentPeriod = reset($currentPeriods);
     }
 
     /**
