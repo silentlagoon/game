@@ -13,6 +13,7 @@ class GameState
     protected string $settlementName;
 
     protected bool $isUserNameBeenSet = false;
+    protected bool $isPaused = false;
 
     protected int $totalWorkersOwned = 0;
     protected int $totalHousesOwned = 0;
@@ -118,5 +119,23 @@ class GameState
     public function decrementTotalWorkersOwned()
     {
         $this->totalWorkersOwned = max($this->totalWorkersOwned - 1, 0);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPaused(): bool
+    {
+        return $this->isPaused;
+    }
+
+    public function pauseGame()
+    {
+        $this->isPaused = true;
+    }
+
+    public function continueGame()
+    {
+        $this->isPaused = false;
     }
 }

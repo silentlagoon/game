@@ -9,6 +9,7 @@ use raylib\Color;
 use raylib\Rectangle;
 use const raylib\KeyboardKey\KEY_BACKSPACE;
 use const raylib\KeyboardKey\KEY_ENTER;
+use const raylib\KeyboardKey\KEY_SPACE;
 use const raylib\MouseCursor\MOUSE_CURSOR_DEFAULT;
 use const raylib\MouseCursor\MOUSE_CURSOR_IBEAM;
 
@@ -54,6 +55,12 @@ class Game
         while (!WindowShouldClose()) {
 
             //UPDATE PHASE
+            if (IsKeyPressed(KEY_SPACE)) {
+                $this->gameState->isPaused() ?
+                    $this->gameState->continueGame() :
+                    $this->gameState->pauseGame();
+            }
+
             if (!$this->gameState->isUserNameBeenSet()) {
                 $formRectangle = new Rectangle(270, 200, 225, 50);
 
@@ -97,40 +104,44 @@ class Game
 
                 ClearBackground($this->colorLightGray);
 
-                if (!$this->gameState->isUserNameBeenSet()) {
-                    DrawText('Enter your user name:', 260, 140, 20, $this->colorGray);
-                    DrawRectangleRec($formRectangle, $this->colorLightGray);
+                if ($this->gameState->isPaused()) {
+                    DrawText("PAUSED", 350, 200, 30, Color::GRAY());
+                } else {
+                    if (!$this->gameState->isUserNameBeenSet()) {
+                        DrawText('Enter your user name:', 260, 140, 20, $this->colorGray);
+                        DrawRectangleRec($formRectangle, $this->colorLightGray);
 
-                    if ($isMouseOnText) {
-                        DrawRectangleLines(
-                            (int) $formRectangle->x,
-                            (int) $formRectangle->y,
-                            (int) $formRectangle->width,
-                            (int) $formRectangle->height,
-                            Color::RED()
-                        );
-                    } else {
-                        DrawRectangleLines(
-                            (int) $formRectangle->x,
-                            (int) $formRectangle->y,
-                            (int) $formRectangle->width,
-                            (int) $formRectangle->height,
-                            $this->colorGray
-                        );
+                        if ($isMouseOnText) {
+                            DrawRectangleLines(
+                                (int) $formRectangle->x,
+                                (int) $formRectangle->y,
+                                (int) $formRectangle->width,
+                                (int) $formRectangle->height,
+                                Color::RED()
+                            );
+                        } else {
+                            DrawRectangleLines(
+                                (int) $formRectangle->x,
+                                (int) $formRectangle->y,
+                                (int) $formRectangle->width,
+                                (int) $formRectangle->height,
+                                $this->colorGray
+                            );
+                        }
+
+                        DrawText($this->gameState->getUserName(), (int) $formRectangle->x + 5, (int) $formRectangle->y + 8, 40, Color::RED());
+
+                        if ($isMouseOnText) {
+                            DrawText("_", (int) $formRectangle->x + 8 + MeasureText($this->gameState->getUserName(), 40), (int) $formRectangle->y + 12, 40, Color::RED());
+                            DrawText('Press BACKSPACE to delete chars...', 230, 300, 20, $this->colorGray);
+                        }
                     }
 
-                    DrawText($this->gameState->getUserName(), (int) $formRectangle->x + 5, (int) $formRectangle->y + 8, 40, Color::RED());
-
-                    if ($isMouseOnText) {
-                        DrawText("_", (int) $formRectangle->x + 8 + MeasureText($this->gameState->getUserName(), 40), (int) $formRectangle->y + 12, 40, Color::RED());
-                        DrawText('Press BACKSPACE to delete chars...', 230, 300, 20, $this->colorGray);
+                    //DRAW UI
+                    if ($this->gameState->isUserNameBeenSet()) {
+                        $this->drawUI($gameTicks);
+                        $gameTicks++;
                     }
-                }
-
-                //DRAW UI
-                if ($this->gameState->isUserNameBeenSet()) {
-                    $this->drawUI($gameTicks);
-                    $gameTicks++;
                 }
 
             EndDrawing();
