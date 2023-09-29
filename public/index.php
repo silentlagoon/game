@@ -23,20 +23,27 @@ use App\Digestor;
 use App\Entities\EntitiesFactory;
 use App\Game;
 use App\Periods\TimesOfYear;
-use App\Profile\Profile;
+use App\Profile\GameState;
 
 require __DIR__.'/../vendor/autoload.php';
 
-$userName = readline('Enter your username: ');
-$settlementName = readline('Enter your settlement name: ');
+//$userName = readline('Enter your username: ');
+$userName = '';
+//$settlementName = readline('Enter your settlement name: ');
+$settlementName = '';
 
-$profile = new Profile();
-$profile->setUserName($userName)
+$gameState = new GameState();
+$gameState->setUserName($userName)
     ->setSettlementName($settlementName)
     ->addStartingGoldAmount();
 
-$digestor = new Digestor([], new TimesOfYear(), 1);
+$digestor = new Digestor($gameState, [], new TimesOfYear(), 1);
 $entitiesFactory = new EntitiesFactory();
 
-$game = new Game($profile, $digestor, $entitiesFactory);
+
+//TODO:: Remove me, testing purposes only
+$digestor->addEntity($entitiesFactory->createWorker('Vasya', $gameState));
+$digestor->addEntity($entitiesFactory->createSmallHouse($gameState));
+
+$game = new Game($gameState, $digestor, $entitiesFactory);
 $game->start();

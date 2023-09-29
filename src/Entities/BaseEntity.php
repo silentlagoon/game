@@ -5,7 +5,7 @@ namespace App\Entities;
 use App\Entities\Contracts\IEntity;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\Periods\Contracts\IPeriod;
-use App\Profile\Profile;
+use App\Profile\GameState;
 
 abstract class BaseEntity implements IEntity
 {
@@ -23,15 +23,15 @@ abstract class BaseEntity implements IEntity
     protected int $entityCost = 0;
 
     /**
-     * @param Profile $profile
+     * @param GameState $profile
      * @throws NotEnoughGoldToSpendException
      */
-    public function __construct(Profile $profile)
+    public function __construct(GameState $profile)
     {
         $profile->spendGoldAmount($this->entityCost);
     }
 
-    public function digestPeriod(IPeriod $period, Profile $profile): array
+    public function digestPeriod(IPeriod $period, GameState $profile): array
     {
         $natureDamage = $this->processNatureDamage($period);
         $collapseDamage = $this->processCollapseDamage($period);
@@ -134,5 +134,10 @@ abstract class BaseEntity implements IEntity
     public function getEntityCost(): int
     {
         return $this->entityCost;
+    }
+
+    public function getGoldEarningsPerPeriod(): int
+    {
+        return $this->isDead() ? 0 : $this->earnsGoldPerPeriod;
     }
 }

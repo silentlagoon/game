@@ -7,6 +7,7 @@ use App\Periods\Contracts\IPeriod;
 class TimesOfYear
 {
     protected IPeriod $currentPeriod;
+    protected int $currentYear = 1;
 
     public function __construct(IPeriod $startingPeriod = null)
     {
@@ -28,7 +29,12 @@ class TimesOfYear
     {
         $currentPeriods = $this->getPeriods();
         $nextPeriodKey = array_search($this->currentPeriod, $currentPeriods) + 1;
-        return $this->currentPeriod = $currentPeriods[$nextPeriodKey] ?? reset($currentPeriods);
+        if (isset($currentPeriods[$nextPeriodKey])) {
+            return $this->currentPeriod = $currentPeriods[$nextPeriodKey];
+        }
+
+        $this->incrementYear();
+        return reset($currentPeriods);
     }
 
     /**
@@ -53,5 +59,15 @@ class TimesOfYear
     public function isWinter(): bool
     {
         return $this->currentPeriod instanceof Winter;
+    }
+
+    public function incrementYear(): void
+    {
+        $this->currentYear += 1;
+    }
+
+    public function getCurrentYear(): int
+    {
+        return $this->currentYear;
     }
 }

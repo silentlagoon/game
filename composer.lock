@@ -4,8 +4,50 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d7611765d957f834415178c175089ede",
-    "packages": [],
+    "content-hash": "beaf0c0988ef5ad0e2119cd5fc159d9d",
+    "packages": [
+        {
+            "name": "joseph-montanez/raylib-php-stub",
+            "version": "v0.8.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/joseph-montanez/RayLib-PHP-Stubs.git",
+                "reference": "6939c0b6ba7a7c6acdc24d2563ecd208bbdafcc8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/joseph-montanez/RayLib-PHP-Stubs/zipball/6939c0b6ba7a7c6acdc24d2563ecd208bbdafcc8",
+                "reference": "6939c0b6ba7a7c6acdc24d2563ecd208bbdafcc8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0.0"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Zlib"
+            ],
+            "description": "Raylib runtime & extensions header files for PhpStorm",
+            "homepage": "https://www.raylib.com",
+            "keywords": [
+                "autocomplete",
+                "code",
+                "inference",
+                "inspection",
+                "jetbrains",
+                "phpstorm",
+                "raylib",
+                "stubs",
+                "type"
+            ],
+            "support": {
+                "issues": "https://github.com/joseph-montanez/RayLib-PHP-Stubs/issues",
+                "source": "https://github.com/joseph-montanez/RayLib-PHP-Stubs/tree/v0.8.2"
+            },
+            "time": "2023-08-09T08:13:38+00:00"
+        }
+    ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",

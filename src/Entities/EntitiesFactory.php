@@ -5,17 +5,17 @@ namespace App\Entities;
 use App\Entities\Living\Humans\Worker;
 use App\Entities\Structures\SmallHouse;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
-use App\Profile\Profile;
+use App\Profile\GameState;
 
 class EntitiesFactory
 {
     /**
      * @param string $workerName
-     * @param Profile $profile
+     * @param GameState $profile
      * @return Worker
      * @throws NotEnoughGoldToSpendException
      */
-    public function createWorker(string $workerName, Profile $profile): Worker
+    public function createWorker(string $workerName, GameState $profile): Worker
     {
         $worker = new Worker($profile);
 
@@ -27,11 +27,11 @@ class EntitiesFactory
     }
 
     /**
-     * @param Profile $profile
+     * @param GameState $profile
      * @return SmallHouse
      * @throws NotEnoughGoldToSpendException
      */
-    public function createSmallHouse(Profile $profile): SmallHouse
+    public function createSmallHouse(GameState $profile): SmallHouse
     {
         return new SmallHouse($profile);
     }

@@ -5,12 +5,14 @@ namespace App\Profile;
 use App\Entities\Living\Humans\Worker;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 
-class Profile
+class GameState
 {
     const STARTING_GOLD_AMOUNT = 100;
 
     protected string $userName;
     protected string $settlementName;
+
+    protected bool $isUserNameBeenSet = false;
 
     protected int $totalWorkersOwned = 0;
     protected int $totalHousesOwned = 0;
@@ -19,7 +21,7 @@ class Profile
 
     protected array $workersGraveyard = [];
 
-    public function setUserName($userName): Profile
+    public function setUserName($userName): GameState
     {
         $this->userName = $userName;
         return $this;
@@ -35,7 +37,7 @@ class Profile
         return $this->settlementName;
     }
 
-    public function setSettlementName(string $settlementName): Profile
+    public function setSettlementName(string $settlementName): GameState
     {
         $this->settlementName = $settlementName;
         return $this;
@@ -95,5 +97,26 @@ class Profile
     public function addDeadWorkerToGraveyard(Worker $worker): void
     {
         $this->workersGraveyard[] = $worker;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUserNameBeenSet(): bool
+    {
+        return $this->isUserNameBeenSet;
+    }
+
+    /**
+     * @param bool $hasUserNameBeenSet
+     */
+    public function setIsUserNameBeenSet(bool $hasUserNameBeenSet): void
+    {
+        $this->isUserNameBeenSet = $hasUserNameBeenSet;
+    }
+
+    public function decrementTotalWorkersOwned()
+    {
+        $this->totalWorkersOwned = max($this->totalWorkersOwned - 1, 0);
     }
 }

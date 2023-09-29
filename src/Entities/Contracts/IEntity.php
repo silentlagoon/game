@@ -3,11 +3,11 @@
 namespace App\Entities\Contracts;
 
 use App\Periods\Contracts\IPeriod;
-use App\Profile\Profile;
+use App\Profile\GameState;
 
 interface IEntity
 {
-    public function digestPeriod(IPeriod $period, Profile $profile): array;
+    public function digestPeriod(IPeriod $period, GameState $profile): array;
     public function getCurrentHitPoints(): int;
     public function setCurrentHitPoints(int $hitPoints): void;
     public function receiveDamage(int $hitPoints): int;
