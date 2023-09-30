@@ -7,6 +7,11 @@ use const raylib\MouseButton\MOUSE_BUTTON_LEFT;
 
 class MainMenuAction extends ApplicationObjectAction
 {
+
+    /**
+     * @return void
+     * @throws NotEnoughGoldToSpendException
+     */
     public function handle()
     {
         $objects = $this->gameState->getGameStateObjects()->getObject(MainMenuAction::class);
@@ -17,11 +22,7 @@ class MainMenuAction extends ApplicationObjectAction
                 if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
                 {
                     if ($name === 'Worker') {
-                        try {
-                            $this->digestor->addEntity($this->entitiesFactory->createWorker('', $this->gameState));
-                        } catch (NotEnoughGoldToSpendException $e) {
-                            return null;
-                        }
+                        $this->digestor->addEntity($this->entitiesFactory->createWorker('', $this->gameState));
                     }
 
                     if ($name === 'Cow') {
@@ -33,11 +34,7 @@ class MainMenuAction extends ApplicationObjectAction
                     }
 
                     if ($name === 'SmallHouse') {
-                        try {
-                            $this->digestor->addEntity($this->entitiesFactory->createSmallHouse($this->gameState));
-                        } catch (NotEnoughGoldToSpendException $e) {
-                            return null;
-                        }
+                        $this->digestor->addEntity($this->entitiesFactory->createSmallHouse($this->gameState));
                     }
                 }
             }

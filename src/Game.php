@@ -93,11 +93,17 @@ class Game
                 $this->gameState->pauseGame();
         }
 
-        if (!$this->gameState->isUserNameBeenSet()) {
-            $this->fireUsernameAction();
-        }
+        //Actions Section
+        try {
+            if (!$this->gameState->isUserNameBeenSet()) {
+                $this->fireUsernameAction();
+            }
 
-        $this->fireMainMenuAction();
+            $this->fireMainMenuAction();
+        } catch (NotEnoughGoldToSpendException $e) {
+            $this->gameState->setError(true);
+            $this->gameState->setErrorMessage($e->getMessage());
+        }
     }
 
     protected function startDrawingPhase()
@@ -107,6 +113,23 @@ class Game
 
             ClearBackground($this->colorLightGray);
 
+            //Error Handler
+            if ($this->gameState->isError()) {
+                if ($this->gameState->getCurrentErrorMessageTickDuration() === 0.00) {
+                    $errorDuration = GetTime() + 2;
+                    $this->gameState->setCurrentErrorMessageTickDuration($errorDuration);
+                }
+
+                if ($this->gameState->getCurrentErrorMessageTickDuration() >= GetTime()) {
+                    $this->drawErrorMessage($this->gameState->getErrorMessage());
+                } else {
+                    $this->gameState->setCurrentErrorMessageTickDuration(0.00);
+                    $this->gameState->setError(false);
+                    $this->gameState->setErrorMessage('');
+                }
+            }
+
+            //Game Pause
             if ($this->gameState->isPaused()) {
                 DrawText("PAUSED", 350, 200, 30, Color::GRAY());
             } else {
@@ -133,6 +156,10 @@ class Game
         $usernameFormAction->handle();
     }
 
+    /**
+     * @return void
+     * @throws NotEnoughGoldToSpendException
+     */
     protected function fireMainMenuAction(): void
     {
         $elements = [];
@@ -153,6 +180,25 @@ class Game
             ->addObject($elements, MainMenuAction::class);
 
         $mainMenuAction->handle();
+    }
+
+    protected function drawErrorMessage(string $errorMessage)
+    {
+        DrawRectangle(
+            0,
+            GetScreenHeight()/2 - MeasureText($errorMessage, 20) / 2,
+            static::SCREEN_WIDTH,
+            20,
+            Color::RED()
+        );
+
+        DrawText(
+            $errorMessage,
+            GetScreenWidth()/2 - MeasureText($errorMessage, 20) / 2,
+            GetScreenHeight()/2 - MeasureText($errorMessage, 20) / 2,
+            20,
+            Color::BLACK()
+        );
     }
 
     protected function drawUsernameForm()

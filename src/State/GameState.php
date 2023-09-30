@@ -25,6 +25,58 @@ class GameState
 
     protected int $ticks = 1;
 
+    protected bool $error = false;
+    protected string $errorMessage = '';
+    protected float $currentErrorMessageTickDuration = 0.00;
+
+    /**
+     * @return float
+     */
+    public function getCurrentErrorMessageTickDuration(): float
+    {
+        return $this->currentErrorMessageTickDuration;
+    }
+
+    /**
+     * @param float $currentErrorMessageTickDuration
+     */
+    public function setCurrentErrorMessageTickDuration(float $currentErrorMessageTickDuration): void
+    {
+        $this->currentErrorMessageTickDuration = $currentErrorMessageTickDuration;
+    }
+
+    /**
+     * @return string
+     */
+    public function getErrorMessage(): string
+    {
+        return $this->errorMessage;
+    }
+
+    /**
+     * @param string $errorMessage
+     */
+    public function setErrorMessage(string $errorMessage): void
+    {
+        $this->errorMessage = $errorMessage;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isError(): bool
+    {
+        return $this->error;
+    }
+
+    /**
+     * @param bool $error
+     */
+    public function setError(bool $error): void
+    {
+        $this->error = $error;
+    }
+
     protected GameStateObjects $gameStateObjects;
 
 
@@ -32,6 +84,8 @@ class GameState
     {
         $this->gameStateObjects = $gameStateObjects;
     }
+
+
 
     /**
      * @return GameStateObjects
@@ -111,7 +165,7 @@ class GameState
         $resultGoldAmount = $this->currentGoldAmount - $amountToSpend;
 
         if ($resultGoldAmount < 0) {
-            throw new NotEnoughGoldToSpendException();
+            throw new NotEnoughGoldToSpendException('You dont have enough gold!');
         }
 
         return $this->currentGoldAmount = $resultGoldAmount;
