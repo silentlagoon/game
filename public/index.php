@@ -22,6 +22,7 @@ $entitiesFactory = new EntitiesFactory();
 
 //TODO:: Remove me, testing purposes only
     $digestor->addEntity($entitiesFactory->createWorker('Vasya', $gameState, 5));
+    $digestor->addEntity($entitiesFactory->createCow($gameState));
     $digestor->addEntity($entitiesFactory->createSmallHouse($gameState));
 //TODO:: Remove me, testing purposes only
 

@@ -24,6 +24,14 @@ class MainMenuAction extends ApplicationObjectAction
                         }
                     }
 
+                    if ($name === 'Cow') {
+                        try {
+                            $this->digestor->addEntity($this->entitiesFactory->createCow( $this->gameState));
+                        } catch (NotEnoughGoldToSpendException $e) {
+                            return null;
+                        }
+                    }
+
                     if ($name === 'SmallHouse') {
                         try {
                             $this->digestor->addEntity($this->entitiesFactory->createSmallHouse($this->gameState));

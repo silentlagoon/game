@@ -4,6 +4,7 @@ namespace App;
 
 use App\Entities\Contracts\IEntity;
 use App\Entities\Living\Humans\Worker;
+use App\Entities\Living\Animals\Cow;
 use App\Entities\Structures\SmallHouse;
 use App\Periods\TimesOfYear;
 use App\State\GameState;
@@ -43,6 +44,10 @@ class Digestor
             $this->gameState->decrementTotalWorkersOwned();
         }
 
+        if ($entity instanceof Cow) {
+            $this->gameState->decrementTotalCowsOwned();
+        }
+
         $entity->setDateOfDeath(new GameDate(
             $this->currentYear,
             $this->timesOfYear->getCurrentPeriod(),
@@ -60,6 +65,10 @@ class Digestor
             $this->gameState->incrementTotalWorkersOwned();
         }
 
+        if ($entity instanceof  Cow) {
+            $this->gameState->incrementTotalCowsOwned();
+        }
+
         if ($entity instanceof SmallHouse) {
             $this->gameState->incrementTotalHousesOwned();
         }
@@ -74,6 +83,13 @@ class Digestor
     {
         return array_values(array_filter($this->entities, function (IEntity $entity) {
             return $entity instanceof Worker;
+        }));
+    }
+
+    public function getCows(): array
+    {
+        return array_values(array_filter($this->entities,function (IEntity $entity){
+            return $entity instanceof Cow;
         }));
     }
 

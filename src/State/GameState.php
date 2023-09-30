@@ -16,6 +16,7 @@ class GameState
     protected bool $isPaused = false;
 
     protected int $totalWorkersOwned = 0;
+    protected int $totalCowsOwned = 0;
     protected int $totalHousesOwned = 0;
 
     protected int $currentGoldAmount = 0;
@@ -25,6 +26,7 @@ class GameState
     protected int $ticks = 1;
 
     protected GameStateObjects $gameStateObjects;
+
 
     public function __construct(GameStateObjects $gameStateObjects)
     {
@@ -148,6 +150,20 @@ class GameState
         $this->totalWorkersOwned += $increment;
     }
 
+    public function getTotalCowsOwned(): int
+    {
+        return $this->totalCowsOwned;
+    }
+
+    /**
+     * @param int $increment
+     * @return void
+     */
+    public function incrementTotalCowsOwned(int $increment = 1)
+    {
+        $this->totalCowsOwned += $increment;
+    }
+
     public function getTotalHousesOwned(): int
     {
         return $this->totalHousesOwned;
@@ -195,6 +211,11 @@ class GameState
     public function decrementTotalWorkersOwned()
     {
         $this->totalWorkersOwned = max($this->totalWorkersOwned - 1, 0);
+    }
+
+    public function decrementTotalCowsOwned()
+    {
+        $this->totalCowsOwned = max($this->totalCowsOwned - 1, 0);
     }
 
     /**

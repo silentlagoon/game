@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use App\Entities\Living\Humans\Worker;
 use App\Entities\Structures\SmallHouse;
+use App\Entities\Living\Animals\Cow;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\State\GameState;
 
@@ -30,6 +31,15 @@ class EntitiesFactory
         return $worker;
     }
 
+    /**
+     * @param GameState $profile
+     * @return Cow
+     * @throws NotEnoughGoldToSpendException
+     */
+    public function createCow(GameState $profile): Cow
+    {
+        return new Cow($profile);
+    }
     /**
      * @param GameState $profile
      * @return SmallHouse

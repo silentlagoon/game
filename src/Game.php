@@ -138,12 +138,13 @@ class Game
         $elements = [];
         $form = [
             'Worker',
+            'Cow',
             'SmallHouse',
         ];
 
         foreach ($form as $key => $formElementName) {
             $height = 30;
-            $positionY = 380 + ($height * $key) + $key;
+            $positionY = 340 + ($height * $key) + $key;
             $elements[$formElementName] = new Rectangle(630, $positionY, 150, $height);
         }
 
@@ -204,6 +205,7 @@ class Game
         $initialWorkersPositionY = $this->drawInventory();
 
         $this->drawWorkers($initialWorkersPositionY);
+        $this->drawCows($initialWorkersPositionY);
         $this->drawSmallHouses($initialWorkersPositionY);
         $this->drawDeadWorkers($initialWorkersPositionY);
 
@@ -310,6 +312,27 @@ class Game
         }
     }
 
+    protected function drawCows(int &$initialWorkersPositionY)
+    {
+        DrawText(sprintf('Cows: %d', $this->gameState->getTotalCowsOwned()),5,$initialWorkersPositionY,20,Color::BLUE());
+
+        $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
+
+        foreach ($this->digestor->getCows() as $cow) {
+            DrawText(
+                sprintf('%s: HP=%d, Income per Season: %d',
+                    $cow->getName(),
+                    $cow->getCurrentHitPoints(),
+                    $cow->getGoldEarningsPerPeriod()
+                ),
+                25,
+                $initialWorkersPositionY,
+                20,
+                Color::BLUE()
+            );
+            $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
+        }
+    }
     protected function drawSmallHouses(int &$initialWorkersPositionY)
     {
         DrawText(sprintf('Houses: %d', $this->gameState->getTotalHousesOwned()), 5, $initialWorkersPositionY, 20, Color::BLUE());
