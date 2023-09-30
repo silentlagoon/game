@@ -8,4 +8,5 @@ interface IPeriod
     public function getNatureDamage(): int;
     public function getCollapseDamage(): int;
     public function getName(): string;
+    public function getDurationInDays(): int;
 }

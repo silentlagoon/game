@@ -2,7 +2,6 @@
   "name": "silentlagoon/game",
   "require": {
     "php": "^8.1.10",
-    "ext-readline": "*",
     "ext-raylib": "*",
     "joseph-montanez/raylib-php-stub": "^0.8.2"
   },

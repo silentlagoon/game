@@ -6,7 +6,7 @@ use App\Entities\Contracts\IEntity;
 use App\Entities\Living\Humans\Worker;
 use App\Entities\Structures\SmallHouse;
 use App\Periods\TimesOfYear;
-use App\Profile\GameState;
+use App\State\GameState;
 
 class Digestor
 {
@@ -26,21 +26,30 @@ class Digestor
     public function digestEntities()
     {
         foreach ($this->entities as $key => $entity) {
+            $entity->digestPeriod($this->timesOfYear->getCurrentPeriod(), $this->gameState);
 
             if ($entity->isDead()) {
-                if ($entity instanceof Worker) {
-                    $this->gameState->addDeadWorkerToGraveyard($entity);
-                    $this->gameState->decrementTotalWorkersOwned();
-                }
-
-                unset($this->entities[$key]);
-                continue;
+                $this->removeEntityFromDigest($entity, $key);
             }
-
-            $entity->digestPeriod($this->timesOfYear->getCurrentPeriod(), $this->gameState);
         }
 
         $this->currentYear++;
+    }
+
+    protected function removeEntityFromDigest(IEntity $entity, int $key): void
+    {
+        if ($entity instanceof Worker) {
+            $this->gameState->addDeadWorkerToGraveyard($entity);
+            $this->gameState->decrementTotalWorkersOwned();
+        }
+
+        $entity->setDateOfDeath(new GameDate(
+            $this->currentYear,
+            $this->timesOfYear->getCurrentPeriod(),
+            $this->gameState->getDaysFromTicks()
+        ));
+
+        unset($this->entities[$key]);
     }
 
     public function addEntity(IEntity $entity): void

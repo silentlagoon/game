@@ -5,7 +5,7 @@ namespace App\Entities;
 use App\Entities\Living\Humans\Worker;
 use App\Entities\Structures\SmallHouse;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
-use App\Profile\GameState;
+use App\State\GameState;
 
 class EntitiesFactory
 {
@@ -15,9 +15,13 @@ class EntitiesFactory
      * @return Worker
      * @throws NotEnoughGoldToSpendException
      */
-    public function createWorker(string $workerName, GameState $profile): Worker
+    public function createWorker(string $workerName, GameState $profile, $currentHitPoints = null): Worker
     {
         $worker = new Worker($profile);
+
+        if (!is_null($currentHitPoints)) {
+            $worker->setCurrentHitPoints($currentHitPoints);
+        }
 
         if (!empty($workerName)) {
             $worker->setName($workerName);

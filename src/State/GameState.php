@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Profile;
+namespace App\State;
 
 use App\Entities\Living\Humans\Worker;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
@@ -22,6 +22,57 @@ class GameState
 
     protected array $workersGraveyard = [];
 
+    protected int $ticks = 1;
+
+    protected GameStateObjects $gameStateObjects;
+
+    public function __construct(GameStateObjects $gameStateObjects)
+    {
+        $this->gameStateObjects = $gameStateObjects;
+    }
+
+    /**
+     * @return GameStateObjects
+     */
+    public function getGameStateObjects(): GameStateObjects
+    {
+        return $this->gameStateObjects;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTicks(): int
+    {
+        return $this->ticks;
+    }
+
+    /**
+     * @param int $ticks
+     */
+    public function setTicks(int $ticks): void
+    {
+        $this->ticks = $ticks;
+    }
+
+    public function incrementTicks()
+    {
+        $this->ticks++;
+    }
+
+    public function getDaysFromTicks(): int
+    {
+        if ($this->ticks > 0) {
+            $days = $this->ticks / 100;
+            return $days > 0 ? (int) $days + 1 : 1;
+        }
+        return 1;
+    }
+
+    /**
+     * @param $userName
+     * @return GameState
+     */
     public function setUserName($userName): GameState
     {
         $this->userName = $userName;
@@ -38,12 +89,21 @@ class GameState
         return $this->settlementName;
     }
 
+    /**
+     * @param string $settlementName
+     * @return GameState
+     */
     public function setSettlementName(string $settlementName): GameState
     {
         $this->settlementName = $settlementName;
         return $this;
     }
 
+    /**
+     * @param int $amountToSpend
+     * @return int
+     * @throws NotEnoughGoldToSpendException
+     */
     public function spendGoldAmount(int $amountToSpend): int
     {
         $resultGoldAmount = $this->currentGoldAmount - $amountToSpend;
@@ -55,6 +115,10 @@ class GameState
         return $this->currentGoldAmount = $resultGoldAmount;
     }
 
+    /**
+     * @param int $amountToAdd
+     * @return int
+     */
     public function addGoldAmount(int $amountToAdd): int
     {
         return $this->currentGoldAmount += $amountToAdd;
@@ -75,6 +139,10 @@ class GameState
         return $this->totalWorkersOwned;
     }
 
+    /**
+     * @param int $increment
+     * @return void
+     */
     public function incrementTotalWorkersOwned(int $increment = 1)
     {
         $this->totalWorkersOwned += $increment;
@@ -85,6 +153,10 @@ class GameState
         return $this->totalHousesOwned;
     }
 
+    /**
+     * @param int $increment
+     * @return void
+     */
     public function incrementTotalHousesOwned(int $increment = 1)
     {
         $this->totalHousesOwned += $increment;
@@ -95,6 +167,10 @@ class GameState
         return $this->workersGraveyard;
     }
 
+    /**
+     * @param Worker $worker
+     * @return void
+     */
     public function addDeadWorkerToGraveyard(Worker $worker): void
     {
         $this->workersGraveyard[] = $worker;

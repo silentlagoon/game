@@ -2,10 +2,11 @@
 
 namespace App\Entities;
 
+use App\GameDate;
 use App\Entities\Contracts\IEntity;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\Periods\Contracts\IPeriod;
-use App\Profile\GameState;
+use App\State\GameState;
 
 abstract class BaseEntity implements IEntity
 {
@@ -22,6 +23,8 @@ abstract class BaseEntity implements IEntity
 
     protected int $entityCost = 0;
 
+    protected GameDate $dateOfDeath;
+
     /**
      * @param GameState $profile
      * @throws NotEnoughGoldToSpendException
@@ -31,19 +34,113 @@ abstract class BaseEntity implements IEntity
         $profile->spendGoldAmount($this->entityCost);
     }
 
-    public function digestPeriod(IPeriod $period, GameState $profile): array
+    /**
+     * @param IPeriod $period
+     * @param GameState $profile
+     * @return void
+     */
+    public function digestPeriod(IPeriod $period, GameState $profile): void
     {
-        $natureDamage = $this->processNatureDamage($period);
-        $collapseDamage = $this->processCollapseDamage($period);
+        $this->processNatureDamage($period);
+        $this->processCollapseDamage($period);
         $earnings = $this->processEarnings($period);
 
         if ($earnings > 0) {
             $profile->addGoldAmount($earnings);
         }
-
-        return compact('natureDamage', 'collapseDamage');
     }
 
+    /**
+     * @param GameDate $date
+     * @return void
+     */
+    public function setDateOfDeath(GameDate $date)
+    {
+        $this->dateOfDeath = $date;
+    }
+
+    /**
+     * @return GameDate|null
+     */
+    public function getDateOfDeath(): ?GameDate
+    {
+        return $this->dateOfDeath ?? null;
+    }
+
+    public function getCurrentHitPoints(): int
+    {
+        return $this->currentHitPoints;
+    }
+
+    public function getMaxHitPoints(): int
+    {
+        return $this->maxHitPoints;
+    }
+
+    public function setCurrentHitPoints(int $hitPoints): void
+    {
+        $this->currentHitPoints = $hitPoints;
+    }
+
+    public function receiveDamage(int $hitPoints): int
+    {
+        $resultHitPointValue = $this->currentHitPoints - $hitPoints;
+        return $this->currentHitPoints = max($resultHitPointValue, 0);
+    }
+
+    public function regenerateDamage(int $hitPoints): int
+    {
+        $resultHitPointValue = $this->currentHitPoints + $hitPoints;
+        return $this->currentHitPoints = min($resultHitPointValue, $this->maxHitPoints);
+    }
+
+    public function getCurrentHitPointsPercent(): int
+    {
+        if ($this->getMaxHitPoints() > 0) {
+            return (int) ($this->currentHitPoints / $this->getMaxHitPoints()) * 100;
+        }
+        return 0;
+    }
+
+    public function isDead(): bool
+    {
+        return $this->currentHitPoints === 0;
+    }
+
+    public function getName(): string
+    {
+        return $this->name ?? (new \ReflectionClass($this))->getShortName();
+    }
+
+    public function setName($name): void
+    {
+        $this->name = ucfirst($name);
+    }
+
+    public function getEntityCost(): int
+    {
+        return $this->entityCost;
+    }
+
+    public function getGoldEarningsPerPeriod(): int
+    {
+        return $this->isDead() ? 0 : $this->earnsGoldPerPeriod;
+    }
+
+    /**
+     * @param GameDate $date
+     * @return void
+     */
+    public function kill(GameDate $date)
+    {
+        $this->setCurrentHitPoints(0);
+        $this->dateOfDeath = $date;
+    }
+
+    /**
+     * @param IPeriod $period
+     * @return array
+     */
     protected function processCollapseDamage(IPeriod $period): array
     {
         $damageReceived = $period->getCollapseDamage();
@@ -78,6 +175,10 @@ abstract class BaseEntity implements IEntity
         return compact('damageReceived', 'damageHealed', 'resultHitPoints');
     }
 
+    /**
+     * @param IPeriod $period
+     * @return int
+     */
     protected function processEarnings(IPeriod $period): int
     {
         $totalEarnings = 0;
@@ -87,57 +188,5 @@ abstract class BaseEntity implements IEntity
         }
 
         return $totalEarnings;
-    }
-
-    public function getCurrentHitPoints(): int
-    {
-        return $this->currentHitPoints;
-    }
-
-    public function getMaxHitPoints(): int
-    {
-        return $this->maxHitPoints;
-    }
-
-    public function setCurrentHitPoints(int $hitPoints): void
-    {
-        $this->currentHitPoints = $hitPoints;
-    }
-
-    public function receiveDamage(int $hitPoints): int
-    {
-        $resultHitPointValue = $this->currentHitPoints - $hitPoints;
-        return $this->currentHitPoints = max($resultHitPointValue, 0);
-    }
-
-    public function regenerateDamage(int $hitPoints): int
-    {
-        $resultHitPointValue = $this->currentHitPoints + $hitPoints;
-        return $this->currentHitPoints = min($resultHitPointValue, $this->maxHitPoints);
-    }
-
-    public function isDead(): bool
-    {
-        return $this->currentHitPoints === 0;
-    }
-
-    public function getName(): string
-    {
-        return $this->name ?? (new \ReflectionClass($this))->getShortName();
-    }
-
-    public function setName($name): void
-    {
-        $this->name = ucfirst($name);
-    }
-
-    public function getEntityCost(): int
-    {
-        return $this->entityCost;
-    }
-
-    public function getGoldEarningsPerPeriod(): int
-    {
-        return $this->isDead() ? 0 : $this->earnsGoldPerPeriod;
     }
 }
