@@ -228,9 +228,28 @@ abstract class BaseEntity implements IEntity
     protected function processFoodConsuming()
     {
         $totalFoodValueAvailable = $this->gameState->getGameStateNaturalResources()->getTotalFoodValue();
+        $foodToConsume = $this->getConsumeFoodAmount();
 
-        if ($totalFoodValueAvailable < $this->getConsumeFoodAmount()) {
+        if ($totalFoodValueAvailable < $foodToConsume) {
             $this->receiveDamage($this->getHungerDamage());
+        }
+
+        $consumables = $this->gameState->getGameStateNaturalResources()->getObjects();
+
+        foreach ($consumables as $key => $value) {
+            if ($foodToConsume === 0) {
+                break;
+            }
+
+            if ($foodToConsume -= $value !== 0) {
+                $this->gameState->getGameStateNaturalResources()
+                    ->addObject(0, $key);
+                continue;
+            }
+
+            $value = $value - $foodToConsume;
+            $this->gameState->getGameStateNaturalResources()
+                ->addObject($value, $key);
         }
     }
 

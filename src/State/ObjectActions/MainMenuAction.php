@@ -24,17 +24,7 @@ class MainMenuAction extends ApplicationObjectAction
             {
                 if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
                 {
-                    switch ($name) {
-                        case $name === Worker::class:
-                            $this->digestor->addEntity($this->entitiesFactory->createWorker($this->gameState));
-                            break;
-                        case $name === Cow::class:
-                            $this->digestor->addEntity($this->entitiesFactory->createCow($this->gameState));
-                            break;
-                        case $name === SmallHouse::class:
-                            $this->digestor->addEntity($this->entitiesFactory->createSmallHouse($this->gameState));
-                            break;
-                    }
+                    $this->digestor->addEntity($this->entitiesFactory->createEntityOfType($name, $this->gameState));
                 }
             }
         }
