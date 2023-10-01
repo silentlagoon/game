@@ -4,7 +4,8 @@
     "php": "^8.1.10",
     "ext-raylib": "*",
     "joseph-montanez/raylib-php-stub": "^0.8.2",
-    "myclabs/php-enum": "^1.8"
+    "myclabs/php-enum": "^1.8",
+    "nubs/random-name-generator": "^2.2"
   },
   "autoload": {
     "psr-4": {

@@ -2,6 +2,7 @@
 
 namespace App\State;
 
+use App\Entities\Contracts\IEntity;
 use App\Entities\Living\Humans\Worker;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 
@@ -295,5 +296,10 @@ class GameState
     public function continueGame()
     {
         $this->isPaused = false;
+    }
+
+    public function isEnoughGoldToBuy(IEntity $entity): bool
+    {
+        return $this->currentGoldAmount >= $entity->getCost();
     }
 }

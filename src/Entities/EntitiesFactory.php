@@ -7,16 +7,18 @@ use App\Entities\Structures\SmallHouse;
 use App\Entities\Living\Animals\Cow;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\State\GameState;
+use Nubs\RandomNameGenerator\All;
 
 class EntitiesFactory
 {
     /**
-     * @param string $workerName
      * @param GameState $profile
+     * @param int|null $currentHitPoints
+     * @param string|null $workerName
      * @return Worker
      * @throws NotEnoughGoldToSpendException
      */
-    public function createWorker(string $workerName, GameState $profile, $currentHitPoints = null): Worker
+    public function createWorker(GameState $profile, ?int $currentHitPoints = null, string $workerName = null): Worker
     {
         $worker = new Worker($profile);
 
@@ -26,6 +28,9 @@ class EntitiesFactory
 
         if (!empty($workerName)) {
             $worker->setName($workerName);
+        } else {
+            $namesGenerator = All::create();
+            $worker->setName($namesGenerator->getName());
         }
 
         return $worker;

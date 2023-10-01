@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Entities\Contracts\IEntity;
+use App\Entities\EntitiesAllowedToBuy;
 use App\Entities\EntitiesFactory;
 use App\Enums\Sounds;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
@@ -90,22 +91,22 @@ class Game
     {
         InitWindow(static::SCREEN_WIDTH, static::SCREEN_HEIGHT, 'The Game');
 
-        $this->initSounds();
+            $this->initSounds();
 
-        $this->gameTextures = $this->loadTextures();
+            $this->gameTextures = $this->loadTextures();
 
-        SetTargetFPS(static::TARGET_FPS);
+            SetTargetFPS(static::TARGET_FPS);
 
-        while (!WindowShouldClose()) {
+            while (!WindowShouldClose()) {
 
-            UpdateMusicStream($this->gameState->getGameStateSounds()->getObject(Sounds::INTRO()->getValue()));
+                UpdateMusicStream($this->gameState->getGameStateSounds()->getObject(Sounds::INTRO()->getValue()));
 
-            $this->startUpdatePhase();
+                $this->startUpdatePhase();
 
-            $this->startDrawingPhase();
-        }
+                $this->startDrawingPhase();
+            }
 
-        $this->gameTextures->unload();
+            $this->gameTextures->unload();
 
         CloseWindow();
     }
@@ -204,11 +205,7 @@ class Game
     protected function fireMainMenuAction(): void
     {
         $elements = [];
-        $form = [
-            'Worker',
-            'Cow',
-            'SmallHouse',
-        ];
+        $form = EntitiesAllowedToBuy::get();
 
         foreach ($form as $key => $formElementName) {
             $height = 30;
@@ -453,16 +450,24 @@ class Game
     protected function drawMainMenu()
     {
         $mainMenu = $this->gameState->getGameStateObjects()->getObject(MainMenuAction::class);
-        $text = 'Buy ';
 
         foreach ($mainMenu as $name => $element) {
+            /** @var IEntity $entityClass */
+            $entityClass = new $name($this->gameState, true);
             $isMouseOver = CheckCollisionPointRec(GetMousePosition(), $element);
-            DrawRectangleRec($element, $isMouseOver ? Color::SKYBLUE() : Color::LIGHTGRAY());
-            DrawRectangleLines($element->x, $element->y, $element->width, $element->height, $isMouseOver ? Color::BLUE() : Color::GRAY());
+            $text = sprintf('Buy %s - %dg.', $entityClass, $entityClass->getCost());
 
-            $positionX = (int)( $element->x + $element->width / 2 - MeasureText($name, 10)/2);
+            if ($this->gameState->isEnoughGoldToBuy($entityClass)) {
+                DrawRectangleRec($element, $isMouseOver ? Color::SKYBLUE() : Color::LIGHTGRAY());
+                DrawRectangleLines($element->x, $element->y, $element->width, $element->height, $isMouseOver ? Color::BLUE() : Color::GRAY());
+            } else {
+                DrawRectangleRec($element, Color::MAROON());
+                DrawRectangleLines($element->x, $element->y, $element->width, $element->height, Color::MAROON());
+            }
+
+            $positionX = (int)( $element->x + $element->width / 2 - MeasureText($text, 10)/2);
             $positionY = (int) $element->y + 11;
-            DrawText($text . $name, $positionX, $positionY, 10, $isMouseOver ? Color::DARKBLUE() : Color::DARKGRAY());
+            DrawText($text, $positionX, $positionY, 10, $isMouseOver ? Color::DARKBLUE() : Color::DARKGRAY());
         }
     }
 }

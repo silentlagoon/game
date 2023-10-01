@@ -2,6 +2,9 @@
 
 namespace App\State\ObjectActions;
 
+use App\Entities\Living\Animals\Cow;
+use App\Entities\Living\Humans\Worker;
+use App\Entities\Structures\SmallHouse;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use const raylib\MouseButton\MOUSE_BUTTON_LEFT;
 
@@ -21,20 +24,16 @@ class MainMenuAction extends ApplicationObjectAction
             {
                 if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
                 {
-                    if ($name === 'Worker') {
-                        $this->digestor->addEntity($this->entitiesFactory->createWorker('', $this->gameState));
-                    }
-
-                    if ($name === 'Cow') {
-                        try {
-                            $this->digestor->addEntity($this->entitiesFactory->createCow( $this->gameState));
-                        } catch (NotEnoughGoldToSpendException $e) {
-                            return null;
-                        }
-                    }
-
-                    if ($name === 'SmallHouse') {
-                        $this->digestor->addEntity($this->entitiesFactory->createSmallHouse($this->gameState));
+                    switch ($name) {
+                        case $name === Worker::class:
+                            $this->digestor->addEntity($this->entitiesFactory->createWorker($this->gameState));
+                            break;
+                        case $name === Cow::class:
+                            $this->digestor->addEntity($this->entitiesFactory->createCow($this->gameState));
+                            break;
+                        case $name === SmallHouse::class:
+                            $this->digestor->addEntity($this->entitiesFactory->createSmallHouse($this->gameState));
+                            break;
                     }
                 }
             }

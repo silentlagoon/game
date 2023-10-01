@@ -27,11 +27,14 @@ abstract class BaseEntity implements IEntity
 
     /**
      * @param GameState $profile
+     * @param bool $isFreeOfCost
      * @throws NotEnoughGoldToSpendException
      */
-    public function __construct(GameState $profile)
+    public function __construct(GameState $profile, bool $isFreeOfCost = false)
     {
-        $profile->spendGoldAmount($this->entityCost);
+        if (!$isFreeOfCost) {
+            $profile->spendGoldAmount($this->getCost());
+        }
     }
 
     public function __toString()
@@ -53,6 +56,11 @@ abstract class BaseEntity implements IEntity
         if ($earnings > 0) {
             $profile->addGoldAmount($earnings);
         }
+    }
+
+    public function getCost(): int
+    {
+        return $this->entityCost;
     }
 
     /**
@@ -120,11 +128,6 @@ abstract class BaseEntity implements IEntity
     public function setName($name): void
     {
         $this->name = ucfirst($name);
-    }
-
-    public function getEntityCost(): int
-    {
-        return $this->entityCost;
     }
 
     public function getGoldEarningsPerPeriod(): int
