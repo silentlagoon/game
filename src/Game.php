@@ -55,33 +55,33 @@ class Game
             'worker' => [
                 'alive' => [
                     'path' => 'assets/Workers/worker.png',
-                    'resize' => [20, 20]
+                    'resize' => [20, 20],
                 ],
                 'dead' => [
                     'path' => 'assets/Workers/dead_worker.png',
-                    'resize' => [20, 20]
-                ]
+                    'resize' => [20, 20],
+                ],
             ],
             'cow' => [
                 'alive' => [
                     'path' => 'assets/Cows/cow.png',
-                    'resize' => [20, 20]
+                    'resize' => [20, 20],
                 ],
                 'dead' => [
                     'path' => 'assets/Cows/cow.png',
-                    'resize' => [20, 20]
+                    'resize' => [20, 20],
                 ],
             ],
             'smallhouse' => [
                 'alive' => [
                     'path' => 'assets/Houses/smallhouse.png',
-                    'resize' => [20, 20]
+                    'resize' => [20, 20],
                 ],
                 'dead' => [
                     'path' => 'assets/Houses/smallhouse.png',
-                    'resize' => [20, 20]
+                    'resize' => [20, 20],
                 ],
-            ]
+            ],
         ];
 
         return new GameTextures($images);
@@ -377,6 +377,7 @@ class Game
 
         $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
 
+        /** @var  $deadWorkers IEntity[] */
         foreach ($deadWorkers as $deadWorker) {
             DrawTexture(
                 $this->gameTextures->getEntityTexture($deadWorker),
@@ -389,7 +390,7 @@ class Game
                 sprintf('%s: HP=%d Income per Season: %d',
                     $deadWorker->getName(),
                     $deadWorker->getCurrentHitPoints(),
-                    $deadWorker->getGoldEarningsPerPeriod()
+                    $deadWorker->getGoldIncomePerPeriod()
                 ),
                 50,
                 $initialWorkersPositionY,
@@ -418,6 +419,7 @@ class Game
 
             $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
 
+            /** @var  $entitiesCollection IEntity[] */
             foreach ($entitiesCollection as $entity) {
                 $this->drawEntity($entity, $initialWorkersPositionY);
             }

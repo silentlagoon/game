@@ -110,7 +110,7 @@ abstract class BaseEntity implements IEntity
     public function getCurrentHitPointsPercent(): int
     {
         if ($this->getCurrentHitPoints() > 0) {
-            return (int) ($this->getCurrentHitPoints() / $this->getMaxHitPoints()) * 100;
+            return (int) (($this->getCurrentHitPoints() / $this->getMaxHitPoints()) * 100);
         }
         return 0;
     }
