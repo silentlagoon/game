@@ -2,9 +2,6 @@
 
 namespace App\State\ObjectActions;
 
-use App\Entities\Living\Animals\Cow;
-use App\Entities\Living\Humans\Worker;
-use App\Entities\Structures\SmallHouse;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use const raylib\MouseButton\MOUSE_BUTTON_LEFT;
 

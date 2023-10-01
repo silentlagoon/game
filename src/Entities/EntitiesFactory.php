@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use App\Entities\Contracts\IEntity;
 use App\Entities\Living\Humans\Worker;
+use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\State\GameState;
 use Nubs\RandomNameGenerator\All;
 
@@ -14,6 +15,7 @@ class EntitiesFactory
      * @param GameState $gameState
      * @param int|null $hitPoints
      * @param string|null $name
+     * @throws NotEnoughGoldToSpendException
      * @return IEntity
      */
     public function createEntityOfType(
