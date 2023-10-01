@@ -36,7 +36,7 @@ class GameTextures
         }
     }
 
-    public function getWorkerTexture(IEntity $entity)
+    public function getEntityTexture(IEntity $entity)
     {
         $entityName = (new \ReflectionClass($entity))->getShortName();
         $entityTextures = $this->textures[strtolower($entityName)];

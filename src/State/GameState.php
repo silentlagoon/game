@@ -29,6 +29,15 @@ class GameState
     protected string $errorMessage = '';
     protected float $currentErrorMessageTickDuration = 0.00;
 
+    protected GameStateObjects $gameStateObjects;
+    protected GameStateSounds $gameStateSounds;
+
+    public function __construct(GameStateObjects $gameStateObjects, GameStateSounds $gameStateSounds)
+    {
+        $this->gameStateObjects = $gameStateObjects;
+        $this->gameStateSounds = $gameStateSounds;
+    }
+
     /**
      * @return float
      */
@@ -77,22 +86,20 @@ class GameState
         $this->error = $error;
     }
 
-    protected GameStateObjects $gameStateObjects;
-
-
-    public function __construct(GameStateObjects $gameStateObjects)
-    {
-        $this->gameStateObjects = $gameStateObjects;
-    }
-
-
-
     /**
      * @return GameStateObjects
      */
     public function getGameStateObjects(): GameStateObjects
     {
         return $this->gameStateObjects;
+    }
+
+    /**
+     * @return GameStateSounds
+     */
+    public function getGameStateSounds(): GameStateSounds
+    {
+        return $this->gameStateSounds;
     }
 
     /**

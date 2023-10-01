@@ -2,7 +2,9 @@
 
 namespace App;
 
+use App\Entities\Contracts\IEntity;
 use App\Entities\EntitiesFactory;
+use App\Enums\Sounds;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\State\GameState;
 use App\State\ObjectActions\MainMenuAction;
@@ -58,6 +60,26 @@ class Game
                     'path' => 'assets/Workers/dead_worker.png',
                     'resize' => [20, 20]
                 ]
+            ],
+            'cow' => [
+                'alive' => [
+                    'path' => 'assets/Cows/cow.png',
+                    'resize' => [20, 20]
+                ],
+                'dead' => [
+                    'path' => 'assets/Cows/cow.png',
+                    'resize' => [20, 20]
+                ],
+            ],
+            'smallhouse' => [
+                'alive' => [
+                    'path' => 'assets/Houses/smallhouse.png',
+                    'resize' => [20, 20]
+                ],
+                'dead' => [
+                    'path' => 'assets/Houses/smallhouse.png',
+                    'resize' => [20, 20]
+                ],
             ]
         ];
 
@@ -68,11 +90,15 @@ class Game
     {
         InitWindow(static::SCREEN_WIDTH, static::SCREEN_HEIGHT, 'The Game');
 
+        $this->initSounds();
+
         $this->gameTextures = $this->loadTextures();
 
         SetTargetFPS(static::TARGET_FPS);
 
         while (!WindowShouldClose()) {
+
+            UpdateMusicStream($this->gameState->getGameStateSounds()->getObject(Sounds::INTRO()->getValue()));
 
             $this->startUpdatePhase();
 
@@ -82,6 +108,19 @@ class Game
         $this->gameTextures->unload();
 
         CloseWindow();
+    }
+
+    protected function initSounds()
+    {
+        InitAudioDevice();
+
+        $musicIntro = LoadMusicStream('assets/Music/intro.mp3');
+        $this->gameState->getGameStateSounds()->addObject($musicIntro, Sounds::INTRO()->getValue());
+        PlayMusicStream($musicIntro);
+
+        $keyBoardKeypressSound = LoadMusicStream('assets/Music/keyboard_keypress.wav');
+        $this->gameState->getGameStateSounds()->addObject($keyBoardKeypressSound, Sounds::KEYBOARD_SOUND()->getValue());
+        PlayMusicStream($keyBoardKeypressSound);
     }
 
     protected function startUpdatePhase()
@@ -132,7 +171,9 @@ class Game
             //Game Pause
             if ($this->gameState->isPaused()) {
                 DrawText("PAUSED", 350, 200, 30, Color::GRAY());
+                PauseMusicStream($this->gameState->getGameStateSounds()->getObject(Sounds::INTRO()->getValue()));
             } else {
+                ResumeMusicStream($this->gameState->getGameStateSounds()->getObject(Sounds::INTRO()->getValue()));
                 if (!$this->gameState->isUserNameBeenSet()) {
                     $this->drawUsernameForm();
                 }
@@ -248,12 +289,11 @@ class Game
 
         $this->drawHeader();
 
-        $initialWorkersPositionY = $this->drawInventory();
+        $initialEntityPositionY = $this->drawInventory();
 
-        $this->drawWorkers($initialWorkersPositionY);
-        $this->drawCows($initialWorkersPositionY);
-        $this->drawSmallHouses($initialWorkersPositionY);
-        $this->drawDeadWorkers($initialWorkersPositionY);
+        $this->drawEntities($initialEntityPositionY);
+
+        $this->drawDeadWorkers($initialEntityPositionY);
 
         $this->drawMainMenu();
     }
@@ -317,90 +357,6 @@ class Game
         return static::INVENTORY_POSITION_Y + 40;
     }
 
-    protected function drawWorkers(int &$initialWorkersPositionY)
-    {
-        DrawText(sprintf('Workers: %d', $this->gameState->getTotalWorkersOwned()), 5, 50, 20, Color::BLUE());
-
-        foreach ($this->digestor->getWorkers() as $worker) {
-            if (!$worker->isDead()) {
-                if ($worker->getCurrentHitPointsPercent() > 50) {
-                    DrawTexture(
-                        $this->gameTextures->getWorkerTexture($worker),
-                        25,
-                        $initialWorkersPositionY,
-                        Color::GREEN()
-                    );
-                }
-
-                if ($worker->getCurrentHitPointsPercent() <= 50) {
-                    DrawTexture(
-                        $this->gameTextures->getWorkerTexture($worker),
-                        25,
-                        $initialWorkersPositionY,
-                        Color::YELLOW()
-                    );
-                }
-
-                DrawText(
-                    sprintf('%s: HP=%d, Income per Season: %d',
-                        $worker->getName(),
-                        $worker->getCurrentHitPoints(),
-                        $worker->getGoldEarningsPerPeriod()
-                    ),
-                    50,
-                    $initialWorkersPositionY,
-                    20,
-                    Color::BLUE()
-                );
-
-                $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
-            }
-        }
-    }
-
-    protected function drawCows(int &$initialWorkersPositionY)
-    {
-        DrawText(sprintf('Cows: %d', $this->gameState->getTotalCowsOwned()),5,$initialWorkersPositionY,20,Color::BLUE());
-
-        $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
-
-        foreach ($this->digestor->getCows() as $cow) {
-            DrawText(
-                sprintf('%s: HP=%d, Income per Season: %d',
-                    $cow->getName(),
-                    $cow->getCurrentHitPoints(),
-                    $cow->getGoldEarningsPerPeriod()
-                ),
-                25,
-                $initialWorkersPositionY,
-                20,
-                Color::BLUE()
-            );
-            $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
-        }
-    }
-    protected function drawSmallHouses(int &$initialWorkersPositionY)
-    {
-        DrawText(sprintf('Houses: %d', $this->gameState->getTotalHousesOwned()), 5, $initialWorkersPositionY, 20, Color::BLUE());
-
-        $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
-
-        foreach ($this->digestor->getSmallHouses() as $smallHouse) {
-            DrawText(
-                sprintf('%s: HP=%d, Income per Season: %d',
-                    $smallHouse->getName(),
-                    $smallHouse->getCurrentHitPoints(),
-                    $smallHouse->getGoldEarningsPerPeriod()
-                ),
-                25,
-                $initialWorkersPositionY,
-                20,
-                Color::BLUE()
-            );
-            $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
-        }
-    }
-
     protected function drawDeadWorkers(int &$initialWorkersPositionY)
     {
         $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
@@ -412,7 +368,7 @@ class Game
 
         foreach ($deadWorkers as $deadWorker) {
             DrawTexture(
-                $this->gameTextures->getWorkerTexture($deadWorker),
+                $this->gameTextures->getEntityTexture($deadWorker),
                 25,
                 $initialWorkersPositionY,
                 Color::MAROON()
@@ -429,6 +385,67 @@ class Game
                 20,
                 Color::MAROON()
             );
+            $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
+        }
+    }
+
+    protected function drawEntities(&$initialWorkersPositionY)
+    {
+        foreach ($this->digestor->getUniqueEntities() as $uniqueEntity) {
+            $entitiesCollection = $this->digestor->getEntitiesOfType($uniqueEntity);
+
+            DrawText(
+                sprintf('%s: %d',
+                    (new \ReflectionClass($uniqueEntity))->getShortName(),
+                    count($entitiesCollection)
+                ),
+                5,
+                $initialWorkersPositionY,
+                20,
+                Color::BLUE()
+            );
+
+            $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
+
+            foreach ($entitiesCollection as $entity) {
+                $this->drawEntity($entity, $initialWorkersPositionY);
+            }
+        }
+    }
+
+    protected function drawEntity(IEntity $entity, &$initialWorkersPositionY)
+    {
+        if (!$entity->isDead()) {
+            if ($entity->getCurrentHitPointsPercent() > 50) {
+                DrawTexture(
+                    $this->gameTextures->getEntityTexture($entity),
+                    25,
+                    $initialWorkersPositionY,
+                    Color::GREEN()
+                );
+            }
+
+            if ($entity->getCurrentHitPointsPercent() <= 50) {
+                DrawTexture(
+                    $this->gameTextures->getEntityTexture($entity),
+                    25,
+                    $initialWorkersPositionY,
+                    Color::YELLOW()
+                );
+            }
+
+            DrawText(
+                sprintf('%s: HP=%d, Income per Season: %d',
+                    $entity->getName(),
+                    $entity->getCurrentHitPoints(),
+                    $entity->getGoldEarningsPerPeriod()
+                ),
+                50,
+                $initialWorkersPositionY,
+                20,
+                Color::BLUE()
+            );
+
             $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
         }
     }

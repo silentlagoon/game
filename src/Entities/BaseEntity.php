@@ -34,6 +34,11 @@ abstract class BaseEntity implements IEntity
         $profile->spendGoldAmount($this->entityCost);
     }
 
+    public function __toString()
+    {
+        return (new \ReflectionClass($this))->getShortName();
+    }
+
     /**
      * @param IPeriod $period
      * @param GameState $profile
@@ -96,8 +101,8 @@ abstract class BaseEntity implements IEntity
 
     public function getCurrentHitPointsPercent(): int
     {
-        if ($this->getMaxHitPoints() > 0) {
-            return (int) ($this->currentHitPoints / $this->getMaxHitPoints()) * 100;
+        if ($this->getCurrentHitPoints() > 0) {
+            return (int) ($this->getCurrentHitPoints() / $this->getMaxHitPoints()) * 100;
         }
         return 0;
     }

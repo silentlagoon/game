@@ -6,13 +6,14 @@ use App\Game;
 use App\Periods\TimesOfYear;
 use App\State\GameState;
 use App\State\GameStateObjects;
+use App\State\GameStateSounds;
 
 require __DIR__.'/../vendor/autoload.php';
 
 $userName = '';
 $settlementName = '';
 
-$gameState = new GameState(new GameStateObjects());
+$gameState = new GameState(new GameStateObjects(), new GameStateSounds());
 $gameState->setUserName($userName)
     ->setSettlementName($settlementName)
     ->addStartingGoldAmount();

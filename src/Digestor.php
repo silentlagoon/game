@@ -79,24 +79,20 @@ class Digestor
         return $this->timesOfYear;
     }
 
-    public function getWorkers(): array
+    public function getEntities(): array
     {
-        return array_values(array_filter($this->entities, function (IEntity $entity) {
-            return $entity instanceof Worker;
-        }));
+        return $this->entities;
     }
 
-    public function getCows(): array
+    public function getUniqueEntities(): array
     {
-        return array_values(array_filter($this->entities,function (IEntity $entity){
-            return $entity instanceof Cow;
-        }));
+        return array_unique($this->getEntities());
     }
 
-    public function getSmallHouses(): array
+    public function getEntitiesOfType(IEntity $entityType): array
     {
-        return array_values(array_filter($this->entities, function (IEntity $entity) {
-            return $entity instanceof SmallHouse;
+        return array_values(array_filter($this->entities, function (IEntity $entity) use ($entityType) {
+            return $entity instanceof $entityType;
         }));
     }
 }
