@@ -16,7 +16,7 @@ abstract class BaseEntity implements IEntity
     protected bool $canBeHealedByNature;
     protected bool $canCollapse;
 
-    protected int $earnsGoldPerPeriod = 0;
+    protected int $goldIncomePerPeriod = 0;
 
     protected int $maxHitPoints;
     protected int $currentHitPoints;
@@ -51,7 +51,7 @@ abstract class BaseEntity implements IEntity
     {
         $this->processNatureDamage($period);
         $this->processCollapseDamage($period);
-        $earnings = $this->processEarnings($period);
+        $earnings = $this->processIncome($period);
 
         if ($earnings > 0) {
             $profile->addGoldAmount($earnings);
@@ -130,9 +130,9 @@ abstract class BaseEntity implements IEntity
         $this->name = ucfirst($name);
     }
 
-    public function getGoldEarningsPerPeriod(): int
+    public function getGoldIncomePerPeriod(): int
     {
-        return $this->isDead() ? 0 : $this->earnsGoldPerPeriod;
+        return $this->isDead() ? 0 : $this->goldIncomePerPeriod;
     }
 
     /**
@@ -187,14 +187,14 @@ abstract class BaseEntity implements IEntity
      * @param IPeriod $period
      * @return int
      */
-    protected function processEarnings(IPeriod $period): int
+    protected function processIncome(IPeriod $period): int
     {
-        $totalEarnings = 0;
+        $totalIncome = 0;
 
-        if ($this->earnsGoldPerPeriod > 0) {
-            $totalEarnings += $this->earnsGoldPerPeriod;
+        if ($this->goldIncomePerPeriod > 0) {
+            $totalIncome += $this->goldIncomePerPeriod;
         }
 
-        return $totalEarnings;
+        return $totalIncome;
     }
 }

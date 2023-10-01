@@ -8,6 +8,6 @@ class Cow extends BaseLivingEntity
 {
     protected int $maxHitPoints = 75;
     protected int $currentHitPoints = 75;
-    protected int $earnsGoldPerPeriod = 2;
+    protected int $goldIncomePerPeriod = 2;
     protected int $entityCost = 15;
 }

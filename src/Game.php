@@ -449,7 +449,7 @@ class Game
                 sprintf('%s: HP=%d, Income per Season: %d',
                     $entity->getName(),
                     $entity->getCurrentHitPoints(),
-                    $entity->getGoldEarningsPerPeriod()
+                    $entity->getGoldIncomePerPeriod()
                 ),
                 50,
                 $initialWorkersPositionY,

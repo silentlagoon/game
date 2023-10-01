@@ -19,7 +19,7 @@ interface IEntity
     public function isDead(): bool;
     public function getName(): string;
     public function setName($name): void;
-    public function getGoldEarningsPerPeriod(): int;
+    public function getGoldIncomePerPeriod(): int;
     public function kill(GameDate $date);
     public function getCost(): int;
 }
