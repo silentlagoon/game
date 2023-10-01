@@ -34,15 +34,34 @@ class GameState
     protected GameStateSounds $gameStateSounds;
     protected GameStateNaturalResources $gameStateNaturalResources;
 
-    public function __construct(
-        GameStateObjects $gameStateObjects,
-        GameStateSounds $gameStateSounds,
-        GameStateNaturalResources $gameStateNaturalResources
-    )
+    /**
+     * @param GameStateObjects $gameStateObjects
+     * @return GameState
+     */
+    public function setGameStateObject(GameStateObjects $gameStateObjects): GameState
     {
         $this->gameStateObjects = $gameStateObjects;
+        return $this;
+    }
+
+    /**
+     * @param GameStateSounds $gameStateSounds
+     * @return GameState
+     */
+    public function setGameStateSounds(GameStateSounds $gameStateSounds): GameState
+    {
         $this->gameStateSounds = $gameStateSounds;
+        return $this;
+    }
+
+    /**
+     * @param GameStateNaturalResources $gameStateNaturalResources
+     * @return GameState
+     */
+    public function setGameStateNaturalResources(GameStateNaturalResources $gameStateNaturalResources): GameState
+    {
         $this->gameStateNaturalResources = $gameStateNaturalResources;
+        return $this;
     }
 
     /**

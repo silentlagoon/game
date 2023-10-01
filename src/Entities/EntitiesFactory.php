@@ -2,56 +2,42 @@
 
 namespace App\Entities;
 
+use App\Entities\Contracts\IEntity;
 use App\Entities\Living\Humans\Worker;
-use App\Entities\Structures\SmallHouse;
-use App\Entities\Living\Animals\Cow;
-use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\State\GameState;
 use Nubs\RandomNameGenerator\All;
 
 class EntitiesFactory
 {
     /**
-     * @param GameState $profile
-     * @param int|null $currentHitPoints
-     * @param string|null $workerName
-     * @return Worker
-     * @throws NotEnoughGoldToSpendException
+     * @param IEntity $entity
+     * @param GameState $gameState
+     * @param int|null $hitPoints
+     * @param string|null $name
+     * @return IEntity
      */
-    public function createWorker(GameState $profile, ?int $currentHitPoints = null, string $workerName = null): Worker
+    public function createEntityOfType(
+        string $entity,
+        GameState $gameState,
+        ?int $hitPoints = null,
+        string $name = null
+    ): IEntity
     {
-        $worker = new Worker($profile);
+        $entity = new $entity($gameState);
 
-        if (!is_null($currentHitPoints)) {
-            $worker->setCurrentHitPoints($currentHitPoints);
+        if (!is_null($hitPoints)) {
+            $entity->setCurrentHitPoints($hitPoints);
         }
 
-        if (!empty($workerName)) {
-            $worker->setName($workerName);
-        } else {
+        if (!empty($name)) {
+            $entity->setName($name);
+        }
+
+        if ($entity instanceof Worker) {
             $namesGenerator = All::create();
-            $worker->setName($namesGenerator->getName());
+            $entity->setName($namesGenerator->getName());
         }
 
-        return $worker;
-    }
-
-    /**
-     * @param GameState $profile
-     * @return Cow
-     * @throws NotEnoughGoldToSpendException
-     */
-    public function createCow(GameState $profile): Cow
-    {
-        return new Cow($profile);
-    }
-    /**
-     * @param GameState $profile
-     * @return SmallHouse
-     * @throws NotEnoughGoldToSpendException
-     */
-    public function createSmallHouse(GameState $profile): SmallHouse
-    {
-        return new SmallHouse($profile);
+        return $entity;
     }
 }

@@ -2,6 +2,9 @@
 
 use App\Digestor;
 use App\Entities\EntitiesFactory;
+use App\Entities\Living\Humans\Worker as HumanWorker;
+use App\Entities\Living\Animals\Cow;
+use App\Entities\Structures\SmallHouse;
 use App\Game;
 use App\Periods\TimesOfYear;
 use App\State\GameState;
@@ -14,11 +17,10 @@ require __DIR__.'/../vendor/autoload.php';
 $userName = '';
 $settlementName = '';
 
-$gameState = new GameState(
-    new GameStateObjects(),
-    new GameStateSounds(),
-    new GameStateNaturalResources()
-);
+$gameState = new GameState();
+$gameState->setGameStateObject(new GameStateObjects())
+    ->setGameStateSounds(new GameStateSounds())
+    ->setGameStateNaturalResources(new GameStateNaturalResources());
 
 $gameState->setUserName($userName)
     ->setSettlementName($settlementName)
@@ -28,9 +30,9 @@ $digestor = new Digestor($gameState, [], new TimesOfYear(), 1);
 $entitiesFactory = new EntitiesFactory();
 
 //TODO:: Remove me, testing purposes only
-    $digestor->addEntity($entitiesFactory->createWorker($gameState, 5));
-    $digestor->addEntity($entitiesFactory->createCow($gameState));
-    $digestor->addEntity($entitiesFactory->createSmallHouse($gameState));
+    $digestor->addEntity($entitiesFactory->createEntityOfType(HumanWorker::class, $gameState, 5));
+    $digestor->addEntity($entitiesFactory->createEntityOfType(Cow::class, $gameState));
+    $digestor->addEntity($entitiesFactory->createEntityOfType(SmallHouse::class, $gameState));
 //TODO:: Remove me, testing purposes only
 
 $game = new Game($gameState, $digestor, $entitiesFactory);
