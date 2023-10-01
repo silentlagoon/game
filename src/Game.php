@@ -224,7 +224,7 @@ class Game
     {
         DrawRectangle(
             0,
-            GetScreenHeight()/2 - MeasureText($errorMessage, 20) / 2,
+            0,
             static::SCREEN_WIDTH,
             20,
             Color::RED()
@@ -233,7 +233,7 @@ class Game
         DrawText(
             $errorMessage,
             GetScreenWidth()/2 - MeasureText($errorMessage, 20) / 2,
-            GetScreenHeight()/2 - MeasureText($errorMessage, 20) / 2,
+            0,
             20,
             Color::BLACK()
         );
@@ -302,7 +302,8 @@ class Game
      */
     protected function drawHeader(): int
     {
-        $headerPositionY = 0;
+        //$headerPositionY value 20 here because error message rectangle requires 20 pixels
+        $headerPositionY = 20;
         $headerFontSize = 20;
         $headerSpaceAfter = 10;
 
