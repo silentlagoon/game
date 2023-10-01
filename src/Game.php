@@ -284,9 +284,9 @@ class Game
             $this->gameState->setTicks(1);
         }
 
-        $this->drawHeader();
+        $initialDrawInventoryPosition = $this->drawHeader();
 
-        $initialEntityPositionY = $this->drawInventory();
+        $initialEntityPositionY = $this->drawInventory($initialDrawInventoryPosition);
 
         $this->drawEntities($initialEntityPositionY);
 
@@ -296,15 +296,23 @@ class Game
     }
 
     //TODO:: Dynamic Header
-    protected function drawHeader()
+
+    /**
+     * @return int
+     */
+    protected function drawHeader(): int
     {
+        $headerPositionY = 0;
+        $headerFontSize = 20;
+        $headerSpaceAfter = 10;
+
         DrawText(
             sprintf('Welcome %s',
                 $this->gameState->getUserName()
             ),
             5,
-            0,
-            20,
+            $headerPositionY,
+            $headerFontSize,
             Color::GREEN()
         );
 
@@ -313,8 +321,8 @@ class Game
                 $this->digestor->getTimesOfYear()->getCurrentPeriod()->getName()
             ),
             150,
-            0,
-            20,
+            $headerPositionY,
+            $headerFontSize,
             Color::GREEN()
         );
 
@@ -323,8 +331,8 @@ class Game
                 $this->gameState->getDaysFromTicks()
             ),
             500,
-            0,
-            20,
+            $headerPositionY,
+            $headerFontSize,
             Color::GREEN()
         );
 
@@ -334,24 +342,29 @@ class Game
                 $this->digestor->getTimesOfYear()->getCurrentYear()
             ),
             600,
-            0,
-            20,
+            $headerPositionY,
+            $headerFontSize,
             Color::GREEN()
         );
+
+        return $headerPositionY + $headerFontSize + $headerSpaceAfter;
     }
 
-    protected function drawInventory(): int
+    protected function drawInventory(int $initialDrawInventoryPosition): int
     {
+        $inventorySpaceAfter = 20;
+        $inventoryFontSize = 20;
+
         DrawText(
             sprintf('Gold: %d',
                 $this->gameState->getCurrentGoldAmount()
             ),
             5,
-            static::INVENTORY_POSITION_Y,
-            20, Color::BLUE()
+            $initialDrawInventoryPosition,
+            $inventoryFontSize, Color::BLUE()
         );
 
-        return static::INVENTORY_POSITION_Y + 40;
+        return $initialDrawInventoryPosition + $inventoryFontSize + $inventorySpaceAfter;
     }
 
     protected function drawDeadWorkers(int &$initialWorkersPositionY)
