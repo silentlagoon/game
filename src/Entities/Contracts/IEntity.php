@@ -8,7 +8,7 @@ use App\State\GameState;
 
 interface IEntity
 {
-    public function digestPeriod(IPeriod $period, GameState $profile): void;
+    public function digestPeriod(IPeriod $period, GameState $gameState): void;
     public function setDateOfDeath(GameDate $date);
     public function getDateOfDeath(): ?GameDate;
     public function getCurrentHitPoints(): int;
@@ -22,4 +22,5 @@ interface IEntity
     public function getGoldIncomePerPeriod(): int;
     public function kill(GameDate $date);
     public function getCost(): int;
+    public function canProduceNaturalResources(): bool;
 }

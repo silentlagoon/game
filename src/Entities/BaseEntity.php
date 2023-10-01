@@ -5,6 +5,7 @@ namespace App\Entities;
 use App\GameDate;
 use App\Entities\Contracts\IEntity;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+use App\NaturalResources\Contracts\INaturalResource;
 use App\Periods\Contracts\IPeriod;
 use App\State\GameState;
 
@@ -16,24 +17,33 @@ abstract class BaseEntity implements IEntity
     protected bool $canBeHealedByNature;
     protected bool $canCollapse;
 
-    protected int $goldIncomePerPeriod = 0;
-
     protected int $maxHitPoints;
     protected int $currentHitPoints;
 
     protected int $entityCost = 0;
+    protected int $goldIncomePerPeriod = 0;
+
+    protected bool $canProduceNaturalResources = false;
+    protected array $produceNaturalResourcesCollection = [];
+
+    protected bool $shouldConsumeFood = false;
+    protected int $consumeFoodAmount = 0;
+    protected int $hungerDamage = 0;
 
     protected GameDate $dateOfDeath;
+    protected GameState $gameState;
 
     /**
-     * @param GameState $profile
+     * @param GameState $gameState
      * @param bool $isFreeOfCost
      * @throws NotEnoughGoldToSpendException
      */
-    public function __construct(GameState $profile, bool $isFreeOfCost = false)
+    public function __construct(GameState $gameState, bool $isFreeOfCost = false)
     {
+        $this->gameState = $gameState;
+
         if (!$isFreeOfCost) {
-            $profile->spendGoldAmount($this->getCost());
+            $this->gameState->spendGoldAmount($this->getCost());
         }
     }
 
@@ -44,18 +54,72 @@ abstract class BaseEntity implements IEntity
 
     /**
      * @param IPeriod $period
-     * @param GameState $profile
+     * @param GameState $gameState
      * @return void
      */
-    public function digestPeriod(IPeriod $period, GameState $profile): void
+    public function digestPeriod(IPeriod $period, GameState $gameState): void
     {
         $this->processNatureDamage($period);
         $this->processCollapseDamage($period);
         $earnings = $this->processIncome($period);
 
         if ($earnings > 0) {
-            $profile->addGoldAmount($earnings);
+            $gameState->addGoldAmount($earnings);
         }
+
+        if ($this->canProduceNaturalResources()) {
+            $this->produceNaturalResources();
+        }
+
+        if ($this->shouldConsumeFood()) {
+            $this->processFoodConsuming();
+        }
+    }
+
+    public function getHungerDamage(): int
+    {
+        return $this->hungerDamage;
+    }
+
+    public function getConsumeFoodAmount(): int
+    {
+        return  $this->consumeFoodAmount;
+    }
+
+    public function shouldConsumeFood(): bool
+    {
+        return $this->shouldConsumeFood;
+    }
+
+    public function produceNaturalResources()
+    {
+        foreach ($this->getProduceNaturalResourcesCollection() as $resource) {
+            /** @var INaturalResource $resource */
+            $resource = new $resource();
+            $totalQuantityProduced = $resource->getProducedQuantity();
+            $gameStateNaturalResources = $this->gameState->getGameStateNaturalResources();
+            $resourceAvailableQuantity = $gameStateNaturalResources->getObject($resource->getName()) ?? 0;
+
+            if ($resourceAvailableQuantity) {
+                $totalQuantityProduced += $resourceAvailableQuantity;
+            }
+
+            $this->gameState->getGameStateNaturalResources()
+                ->addObject($totalQuantityProduced, $resource->getName());
+        }
+    }
+
+    public function canProduceNaturalResources(): bool
+    {
+        return $this->canProduceNaturalResources;
+    }
+
+    /**
+     * @return array
+     */
+    public function getProduceNaturalResourcesCollection(): array
+    {
+        return $this->produceNaturalResourcesCollection;
     }
 
     public function getCost(): int
@@ -159,6 +223,15 @@ abstract class BaseEntity implements IEntity
 
         $resultHitPoints = sprintf('%s / %s', $this->getCurrentHitPoints(), $this->getMaxHitPoints());
         return compact('damageReceived', 'resultHitPoints');
+    }
+
+    protected function processFoodConsuming()
+    {
+        $totalFoodValueAvailable = $this->gameState->getGameStateNaturalResources()->getTotalFoodValue();
+
+        if ($totalFoodValueAvailable < $this->getConsumeFoodAmount()) {
+            $this->receiveDamage($this->getHungerDamage());
+        }
     }
 
     /**

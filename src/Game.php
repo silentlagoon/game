@@ -295,8 +295,6 @@ class Game
         $this->drawMainMenu();
     }
 
-    //TODO:: Dynamic Header
-
     /**
      * @return int
      */
@@ -343,6 +341,23 @@ class Game
                 $this->digestor->getTimesOfYear()->getCurrentYear()
             ),
             600,
+            $headerPositionY,
+            $headerFontSize,
+            Color::GREEN()
+        );
+
+        $foodPositionX = MeasureText(sprintf(
+            'Year: %d',
+            $this->digestor->getTimesOfYear()->getCurrentYear()
+        ), 20);
+
+        $food = $this->gameState->getGameStateNaturalResources()->getTotalFoodValue();
+        DrawText(
+            sprintf(
+                'Food: %d',
+                $food
+            ),
+            600 + $foodPositionX + 10,
             $headerPositionY,
             $headerFontSize,
             Color::GREEN()

@@ -10,4 +10,8 @@ class Worker extends BaseLivingEntity
     protected int $currentHitPoints = 100;
     protected int $goldIncomePerPeriod = 1;
     protected int $entityCost = 10;
+
+    protected bool $shouldConsumeFood = true;
+    protected int $consumeFoodAmount = 2;
+    protected int $hungerDamage = 30;
 }

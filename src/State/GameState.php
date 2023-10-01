@@ -32,11 +32,17 @@ class GameState
 
     protected GameStateObjects $gameStateObjects;
     protected GameStateSounds $gameStateSounds;
+    protected GameStateNaturalResources $gameStateNaturalResources;
 
-    public function __construct(GameStateObjects $gameStateObjects, GameStateSounds $gameStateSounds)
+    public function __construct(
+        GameStateObjects $gameStateObjects,
+        GameStateSounds $gameStateSounds,
+        GameStateNaturalResources $gameStateNaturalResources
+    )
     {
         $this->gameStateObjects = $gameStateObjects;
         $this->gameStateSounds = $gameStateSounds;
+        $this->gameStateNaturalResources = $gameStateNaturalResources;
     }
 
     /**
@@ -101,6 +107,14 @@ class GameState
     public function getGameStateSounds(): GameStateSounds
     {
         return $this->gameStateSounds;
+    }
+
+    /**
+     * @return GameStateNaturalResources
+     */
+    public function getGameStateNaturalResources(): GameStateNaturalResources
+    {
+        return $this->gameStateNaturalResources;
     }
 
     /**
