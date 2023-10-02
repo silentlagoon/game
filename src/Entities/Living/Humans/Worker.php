@@ -17,4 +17,6 @@ class Worker extends BaseLivingEntity
 
     protected bool $isMovable = true;
     protected float $entitySpeed = 2.0;
+
+    protected  bool $canUseEquipment = true;
 }

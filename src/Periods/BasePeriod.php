@@ -10,6 +10,7 @@ abstract class BasePeriod implements IPeriod
     protected string $name;
     protected array $healValueRanges = [];
     protected array $damageValueRanges = [];
+    protected array $wearValueRanges = [];
     protected array $collapseValueRanges = [];
 
     public function getDurationInDays(): int
@@ -32,6 +33,10 @@ abstract class BasePeriod implements IPeriod
         return $this->calculateChangeOfRange($this->collapseValueRanges);
     }
 
+    public function getWearDamage(): int
+    {
+        return $this->calculateChangeOfRange($this->wearValueRanges);
+    }
     public function getName(): string
     {
         return $this->name ?? (new \ReflectionClass($this))->getShortName();

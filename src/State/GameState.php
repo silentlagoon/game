@@ -33,6 +33,7 @@ class GameState
     protected GameStateObjects $gameStateObjects;
     protected GameStateSounds $gameStateSounds;
     protected GameStateNaturalResources $gameStateNaturalResources;
+    protected GameStateItems $gameStateItems;
 
     /**
      * @param GameStateObjects $gameStateObjects
