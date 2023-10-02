@@ -212,27 +212,29 @@ class Game
 
     protected function moveEntity(IEntity $entity)
     {
-        $entityPositionX = $entity->getEntityMoveOptions()->getPosition()->x + $entity->getEntityMoveOptions()->getSpeed()->x;
-        $entityPositionY = $entity->getEntityMoveOptions()->getPosition()->y + $entity->getEntityMoveOptions()->getSpeed()->y;
+        $moveOptions = $entity->getEntityMoveOptions();
 
-        $entity->getEntityMoveOptions()->setPosition(new Vector2($entityPositionX, $entityPositionY));
+        $entityPositionX = $moveOptions->getPosition()->x + $moveOptions->getSpeed()->x;
+        $entityPositionY = $moveOptions->getPosition()->y + $moveOptions->getSpeed()->y;
+
+        $moveOptions->setPosition(new Vector2($entityPositionX, $entityPositionY));
 
         if (
-            ($entity->getEntityMoveOptions()->getPosition()->x >= (GetScreenWidth() - $entity->getEntityMoveOptions()->getRadius())) ||
-            ($entity->getEntityMoveOptions()->getPosition()->y <= $entity->getEntityMoveOptions()->getRadius())
+            ($moveOptions->getPosition()->x >= (GetScreenWidth() - $moveOptions->getRadius())) ||
+            ($moveOptions->getPosition()->y <= $moveOptions->getRadius())
         ) {
-            $entitySpeedX = $entity->getEntityMoveOptions()->getSpeed()->x *= -1.0;
-            $entitySpeedY = $entity->getEntityMoveOptions()->getSpeed()->y;
+            $entitySpeedX = $moveOptions->getSpeed()->x *= -1.0;
+            $entitySpeedY = $moveOptions->getSpeed()->y;
 
-            $entity->getEntityMoveOptions()->setSpeed(new Vector2($entitySpeedX, $entitySpeedY));
+            $moveOptions->setSpeed(new Vector2($entitySpeedX, $entitySpeedY));
         }
 
         if (
-            ($entity->getEntityMoveOptions()->getPosition()->y >= (GetScreenHeight() - $entity->getEntityMoveOptions()->getRadius())) ||
-            ($entity->getEntityMoveOptions()->getPosition()->y <= $entity->getEntityMoveOptions()->getRadius())
+            ($moveOptions->getPosition()->y >= (GetScreenHeight() - $moveOptions->getRadius())) ||
+            ($moveOptions->getPosition()->y <= $moveOptions->getRadius())
         ) {
-            $entitySpeedX = $entity->getEntityMoveOptions()->getSpeed()->x;
-            $entitySpeedY = $entity->getEntityMoveOptions()->getSpeed()->y *= -1.0;
+            $entitySpeedX = $moveOptions->getSpeed()->x;
+            $entitySpeedY = $moveOptions->getSpeed()->y *= -1.0;
 
             $entity->getEntityMoveOptions()->setSpeed(new Vector2($entitySpeedX, $entitySpeedY));
         }
@@ -312,6 +314,11 @@ class Game
             DrawText("_", (int) $usernameForm->x + 8 + MeasureText($this->gameState->getUserName(), 40), (int) $usernameForm->y + 12, 40, Color::RED());
             DrawText('Press BACKSPACE to delete chars...', 230, 300, 20, $this->colorGray);
         }
+    }
+
+    protected function drawHitPoints()
+    {
+
     }
 
     protected function drawUI()
