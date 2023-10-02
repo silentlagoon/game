@@ -14,10 +14,13 @@ use App\State\GameState;
 use App\State\ObjectActions\HitPointsAction;
 use App\State\ObjectActions\MainMenuAction;
 use App\State\ObjectActions\UsernameFormAction;
+use App\Tasks\WalkTask;
 use raylib\Color;
 use raylib\Rectangle;
 use raylib\Vector2;
 use const raylib\KeyboardKey\KEY_SPACE;
+use const raylib\MouseButton\MOUSE_BUTTON_LEFT;
+use const raylib\MouseButton\MOUSE_BUTTON_RIGHT;
 
 class Game
 {
@@ -145,6 +148,41 @@ class Game
             }
 
             $this->fireMainMenuAction();
+
+            foreach ($this->digestor->getEntities() as $entity) {
+                if ($entity->canMove()) {
+                    $entityPosition = $entity->getMoveOptions()->getPosition();
+                    $texture = $this->gameTextures->getEntityTexture($entity);
+                    $isMouseOnEntity = CheckCollisionPointRec(
+                        GetMousePosition(),
+                        new Rectangle($entityPosition->x, $entityPosition->y, $texture->width, $texture->height)
+                    );
+
+                    if ($isMouseOnEntity) {
+                        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+                            $entity->setSelected(true);
+                        }
+                    }
+
+                    if (!$isMouseOnEntity) {
+                        if ($entity->isSelected()) {
+                            if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
+                                $walkTask = new WalkTask();
+                                $walkTask->setDirection(GetMousePosition());
+
+                                //Clear current walk tasks being executed
+                                $entity->getTaskQueue()->clearOfType($walkTask);
+
+                                if ($entity->getTask() instanceof $walkTask) {
+                                    $entity->setTask(null);
+                                }
+
+                                $entity->getTaskQueue()->push($walkTask);
+                            }
+                        }
+                    }
+                }
+            }
         } catch (NotEnoughGoldToSpendException $e) {
             $this->gameState->setError(true);
             $this->gameState->setErrorMessage($e->getMessage());
@@ -281,7 +319,7 @@ class Game
 
     protected function drawUI()
     {
-        $this->digestor->digestEntitiesMovement();
+        $this->digestor->digestEntitiesTasks();
 
         $currentPeriod = $this->digestor->getTimesOfYear()->getCurrentPeriod();
 
@@ -413,8 +451,8 @@ class Game
             if ($deadWorker->canMove()) {
                 DrawTexture(
                     $this->gameTextures->getEntityTexture($deadWorker),
-                    $deadWorker->getEntityMoveOptions()->getPosition()->x,
-                    $deadWorker->getEntityMoveOptions()->getPosition()->y,
+                    $deadWorker->getMoveOptions()->getPosition()->x,
+                    $deadWorker->getMoveOptions()->getPosition()->y,
                     Color::MAROON()
                 );
             }
@@ -473,8 +511,8 @@ class Game
                 if ($entity->canMove()) {
                     DrawTexture(
                         $this->gameTextures->getEntityTexture($entity),
-                        $entity->getEntityMoveOptions()->getPosition()->x,
-                        $entity->getEntityMoveOptions()->getPosition()->y,
+                        $entity->getMoveOptions()->getPosition()->x,
+                        $entity->getMoveOptions()->getPosition()->y,
                         Color::GREEN()
                     );
                 }
@@ -492,8 +530,8 @@ class Game
                 if ($entity->canMove()) {
                     DrawTexture(
                         $this->gameTextures->getEntityTexture($entity),
-                        $entity->getEntityMoveOptions()->getPosition()->x,
-                        $entity->getEntityMoveOptions()->getPosition()->y,
+                        $entity->getMoveOptions()->getPosition()->x,
+                        $entity->getMoveOptions()->getPosition()->y,
                         Color::YELLOW()
                     );
                 }
@@ -510,6 +548,16 @@ class Game
                 20,
                 Color::BLUE()
             );
+
+            if ($entity->isSelected()) {
+                DrawRectangleLines(
+                    $entity->getMoveOptions()->getPosition()->x,
+                    $entity->getMoveOptions()->getPosition()->y,
+                    $this->gameTextures->getEntityTexture($entity)->width,
+                    $this->gameTextures->getEntityTexture($entity)->width,
+                    Color::GREEN()
+                );
+            }
 
             $initialWorkersPositionY += static::WORKERS_UI_STEPPING_Y;
         }

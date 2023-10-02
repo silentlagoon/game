@@ -7,6 +7,8 @@ use App\Periods\Contracts\IPeriod;
 use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;
 use App\State\GameState;
+use App\Tasks\Contracts\ITask;
+use App\Tasks\TaskQueue;
 
 interface IEntity
 {
@@ -32,9 +34,17 @@ interface IEntity
     public function getEntitySpeed(): float;
     public function setEntitySpeed(float $entitySpeed): void;
     public function canMove(): bool;
-    public function getEntityMoveOptions(): ?EntityMoveOptions;
+    public function getMoveOptions(): ?EntityMoveOptions;
     public function setEntityMoveOptions(EntityMoveOptions $entityMoveOptions);
     public function getEntityHitPointsOptions(): EntityHitPointsOptions;
     public function setEntityHitPointsOptions(EntityHitPointsOptions $entityHitPointsOptions): void;
     public function move(): void;
+    public function setTask(?ITask $task);
+    public function getTask(): ?ITask;
+    public function isSelected(): bool;
+    public function setSelected(bool $value): void;
+    public function getTaskQueue(): TaskQueue;
+    public function setTaskQueue(TaskQueue $taskQueue);
+    public function digestTasks();
+
 }

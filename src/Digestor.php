@@ -16,11 +16,20 @@ class Digestor
     protected TimesOfYear $timesOfYear;
     protected int $currentYear;
     protected GameState $gameState;
+    /** @var $entitiesSelected IEntity[] */
+    protected array $entitiesSelected;
 
-    public function __construct(GameState $gameState, array $entities, TimesOfYear $timesOfYear, int $currentYear)
+    public function __construct(
+        GameState $gameState,
+        array $entities,
+        array$entitiesSelected,
+        TimesOfYear $timesOfYear,
+        int $currentYear
+    )
     {
         $this->gameState = $gameState;
         $this->entities = $entities;
+        $this->entitiesSelected = $entitiesSelected;
         $this->timesOfYear = $timesOfYear;
         $this->currentYear = $currentYear;
     }
@@ -41,31 +50,20 @@ class Digestor
         $this->currentYear++;
     }
 
-    public function digestEntitiesMovement()
+    public function digestEntitiesTasks()
     {
         foreach ($this->entities as $entity) {
-            $entity->move();
+            $entity->digestTasks();
         }
     }
 
-    protected function removeEntityFromDigest(IEntity $entity, int $key): void
+    public function clearSelectedEntities()
     {
-        if ($entity instanceof Worker) {
-            $this->gameState->addDeadWorkerToGraveyard($entity);
-            $this->gameState->decrementTotalWorkersOwned();
+        foreach ($this->entitiesSelected as $entity) {
+            $entity->setSelected(false);
         }
 
-        if ($entity instanceof Cow) {
-            $this->gameState->decrementTotalCowsOwned();
-        }
-
-        $entity->setDateOfDeath(new GameDate(
-            $this->currentYear,
-            $this->timesOfYear->getCurrentPeriod(),
-            $this->gameState->getDaysFromTicks()
-        ));
-
-        unset($this->entities[$key]);
+        $this->entitiesSelected = [];
     }
 
     public function addEntity(IEntity $entity): void
@@ -83,6 +81,17 @@ class Digestor
         if ($entity instanceof SmallHouse) {
             $this->gameState->incrementTotalHousesOwned();
         }
+    }
+
+    public function selectEntity(IEntity $entity): void
+    {
+        $entity->setSelected(true);
+        $this->entitiesSelected[] = $entity;
+    }
+
+    public function getEntitiesSelected(): array
+    {
+        return $this->entitiesSelected;
     }
 
     public function getTimesOfYear(): TimesOfYear
@@ -105,5 +114,25 @@ class Digestor
         return array_values(array_filter($this->entities, function (IEntity $entity) use ($entityType) {
             return $entity instanceof $entityType;
         }));
+    }
+
+    protected function removeEntityFromDigest(IEntity $entity, int $key): void
+    {
+        if ($entity instanceof Worker) {
+            $this->gameState->addDeadWorkerToGraveyard($entity);
+            $this->gameState->decrementTotalWorkersOwned();
+        }
+
+        if ($entity instanceof Cow) {
+            $this->gameState->decrementTotalCowsOwned();
+        }
+
+        $entity->setDateOfDeath(new GameDate(
+            $this->currentYear,
+            $this->timesOfYear->getCurrentPeriod(),
+            $this->gameState->getDaysFromTicks()
+        ));
+
+        unset($this->entities[$key]);
     }
 }

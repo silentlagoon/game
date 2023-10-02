@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Entities\Contracts\IEntity;
+use raylib\Texture;
 
 class GameTextures
 {
@@ -36,7 +37,7 @@ class GameTextures
         }
     }
 
-    public function getEntityTexture(IEntity $entity)
+    public function getEntityTexture(IEntity $entity): Texture
     {
         $entityName = (new \ReflectionClass($entity))->getShortName();
         $entityTextures = $this->textures[strtolower($entityName)];

@@ -11,6 +11,9 @@ use App\Periods\Contracts\IPeriod;
 use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;
 use App\State\GameState;
+use App\Tasks\Contracts\ITask;
+use App\Tasks\TaskQueue;
+use App\Tasks\WalkTask;
 use raylib\Rectangle;
 use raylib\Vector2;
 
@@ -45,6 +48,11 @@ abstract class BaseEntity implements IEntity
 
     protected GameDate $dateOfDeath;
     protected GameState $gameState;
+
+    protected ?ITask $task = null;
+    protected TaskQueue $taskQueue;
+    protected bool $isSelected = false;
+
 
     /**
      * @param GameState $gameState
@@ -89,6 +97,39 @@ abstract class BaseEntity implements IEntity
         }
     }
 
+    public function digestTasks()
+    {
+        if (!$this->getTask()) {
+            if ($this->getTaskQueue()->getTasks()) {
+                $this->setTask($this->getTaskQueue()->getNext());
+                return $this->getTask()->handle($this);
+            }
+            return $this->move();
+        }
+
+        return $this->getTask()->handle($this);
+    }
+
+    public function getTaskQueue(): TaskQueue
+    {
+        return $this->taskQueue;
+    }
+
+    public function setTaskQueue(TaskQueue $taskQueue)
+    {
+        $this->taskQueue = $taskQueue;
+    }
+
+    public function isSelected(): bool
+    {
+        return $this->isSelected;
+    }
+
+    public function setSelected(bool $value): void
+    {
+        $this->isSelected = $value;
+    }
+
     /**
      * @return EntityHitPointsOptions
      */
@@ -108,7 +149,7 @@ abstract class BaseEntity implements IEntity
     /**
      * @return EntityMoveOptions
      */
-    public function getEntityMoveOptions(): EntityMoveOptions
+    public function getMoveOptions(): EntityMoveOptions
     {
         return $this->entityMoveOptions;
     }
@@ -177,7 +218,7 @@ abstract class BaseEntity implements IEntity
             return;
         }
 
-        $moveOptions = $this->getEntityMoveOptions();
+        $moveOptions = $this->getMoveOptions();
         $hitPointsOptions = $this->getEntityHitPointsOptions();
 
         $entityPositionX = $moveOptions->getPosition()->x + $moveOptions->getSpeed()->x;
@@ -212,8 +253,18 @@ abstract class BaseEntity implements IEntity
             $entitySpeedX = $moveOptions->getSpeed()->x;
             $entitySpeedY = $moveOptions->getSpeed()->y *= -1.0;
 
-            $this->getEntityMoveOptions()->setSpeed(new Vector2($entitySpeedX, $entitySpeedY));
+            $this->getMoveOptions()->setSpeed(new Vector2($entitySpeedX, $entitySpeedY));
         }
+    }
+
+    public function setTask(?ITask $task)
+    {
+        $this->task = $task;
+    }
+
+    public function getTask(): ?ITask
+    {
+        return $this->task;
     }
 
     public function getHungerDamage(): int

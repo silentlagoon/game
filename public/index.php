@@ -26,7 +26,7 @@ $gameState->setUserName($userName)
     ->setSettlementName($settlementName)
     ->addStartingGoldAmount();
 
-$digestor = new Digestor($gameState, [], new TimesOfYear(), 1);
+$digestor = new Digestor($gameState, [], [], new TimesOfYear(), 1);
 $entitiesFactory = new EntitiesFactory();
 
 //TODO:: Remove me, testing purposes only

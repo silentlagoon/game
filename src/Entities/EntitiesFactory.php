@@ -8,6 +8,7 @@ use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;
 use App\State\GameState;
+use App\Tasks\TaskQueue;
 use Nubs\RandomNameGenerator\All;
 use raylib\Rectangle;
 use raylib\Vector2;
@@ -62,6 +63,8 @@ class EntitiesFactory
             $entity->setName($namesGenerator->getName());
         }
 
+        $entity->setTaskQueue(new TaskQueue());
+
         return $entity;
     }
 
@@ -107,6 +110,8 @@ class EntitiesFactory
             $namesGenerator = All::create();
             $entity->setName($namesGenerator->getName());
         }
+
+        $entity->setTaskQueue(new TaskQueue());
 
         return $entity;
     }
