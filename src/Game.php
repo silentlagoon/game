@@ -5,13 +5,17 @@ namespace App;
 use App\Entities\Contracts\IEntity;
 use App\Entities\EntitiesAllowedToBuy;
 use App\Entities\EntitiesFactory;
+use App\Entities\Living\Animals\Cow;
+use App\Entities\Living\Humans\Worker;
 use App\Enums\Sounds;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+use App\Position\EntityMoveOptions;
 use App\State\GameState;
 use App\State\ObjectActions\MainMenuAction;
 use App\State\ObjectActions\UsernameFormAction;
 use raylib\Color;
 use raylib\Rectangle;
+use raylib\Vector2;
 use const raylib\KeyboardKey\KEY_SPACE;
 
 class Game
@@ -140,6 +144,14 @@ class Game
             }
 
             $this->fireMainMenuAction();
+
+            /** @var IEntity[] $entities */
+            $entities = $this->digestor->getEntities();
+            foreach ($entities as $entity) {
+                if ($entity->canMove()) {
+                    $this->moveEntity($entity);
+                }
+            }
         } catch (NotEnoughGoldToSpendException $e) {
             $this->gameState->setError(true);
             $this->gameState->setErrorMessage($e->getMessage());
@@ -196,6 +208,34 @@ class Game
             ->addObject(new Rectangle(270, 200, 225, 50), UsernameFormAction::class);
 
         $usernameFormAction->handle();
+    }
+
+    protected function moveEntity(IEntity $entity)
+    {
+        $entityPositionX = $entity->getEntityMoveOptions()->getPosition()->x + $entity->getEntityMoveOptions()->getSpeed()->x;
+        $entityPositionY = $entity->getEntityMoveOptions()->getPosition()->y + $entity->getEntityMoveOptions()->getSpeed()->y;
+
+        $entity->getEntityMoveOptions()->setPosition(new Vector2($entityPositionX, $entityPositionY));
+
+        if (
+            ($entity->getEntityMoveOptions()->getPosition()->x >= (GetScreenWidth() - $entity->getEntityMoveOptions()->getRadius())) ||
+            ($entity->getEntityMoveOptions()->getPosition()->y <= $entity->getEntityMoveOptions()->getRadius())
+        ) {
+            $entitySpeedX = $entity->getEntityMoveOptions()->getSpeed()->x *= -1.0;
+            $entitySpeedY = $entity->getEntityMoveOptions()->getSpeed()->y;
+
+            $entity->getEntityMoveOptions()->setSpeed(new Vector2($entitySpeedX, $entitySpeedY));
+        }
+
+        if (
+            ($entity->getEntityMoveOptions()->getPosition()->y >= (GetScreenHeight() - $entity->getEntityMoveOptions()->getRadius())) ||
+            ($entity->getEntityMoveOptions()->getPosition()->y <= $entity->getEntityMoveOptions()->getRadius())
+        ) {
+            $entitySpeedX = $entity->getEntityMoveOptions()->getSpeed()->x;
+            $entitySpeedY = $entity->getEntityMoveOptions()->getSpeed()->y *= -1.0;
+
+            $entity->getEntityMoveOptions()->setSpeed(new Vector2($entitySpeedX, $entitySpeedY));
+        }
     }
 
     /**
@@ -401,6 +441,15 @@ class Game
                 Color::MAROON()
             );
 
+            if ($deadWorker->canMove()) {
+                DrawTexture(
+                    $this->gameTextures->getEntityTexture($deadWorker),
+                    $deadWorker->getEntityMoveOptions()->getPosition()->x,
+                    $deadWorker->getEntityMoveOptions()->getPosition()->y,
+                    Color::MAROON()
+                );
+            }
+
             DrawText(
                 sprintf('%s: HP=%d Income per Season: %d',
                     $deadWorker->getName(),
@@ -451,6 +500,16 @@ class Game
                     $initialWorkersPositionY,
                     Color::GREEN()
                 );
+
+                if ($entity->canMove()) {
+                    DrawTexture(
+                        $this->gameTextures->getEntityTexture($entity),
+                        $entity->getEntityMoveOptions()->getPosition()->x,
+                        $entity->getEntityMoveOptions()->getPosition()->y,
+                        Color::GREEN()
+                    );
+                }
+
             }
 
             if ($entity->getCurrentHitPointsPercent() <= 50) {
@@ -460,6 +519,15 @@ class Game
                     $initialWorkersPositionY,
                     Color::YELLOW()
                 );
+
+                if ($entity->canMove()) {
+                    DrawTexture(
+                        $this->gameTextures->getEntityTexture($entity),
+                        $entity->getEntityMoveOptions()->getPosition()->x,
+                        $entity->getEntityMoveOptions()->getPosition()->y,
+                        Color::YELLOW()
+                    );
+                }
             }
 
             DrawText(
@@ -483,8 +551,7 @@ class Game
         $mainMenu = $this->gameState->getGameStateObjects()->getObject(MainMenuAction::class);
 
         foreach ($mainMenu as $name => $element) {
-            /** @var IEntity $entityClass */
-            $entityClass = new $name($this->gameState, true);
+            $entityClass = $this->entitiesFactory->createFreeEntityOfType($name, $this->gameState);
             $isMouseOver = CheckCollisionPointRec(GetMousePosition(), $element);
             $text = sprintf('Buy %s - %dg.', $entityClass, $entityClass->getCost());
 

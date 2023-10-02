@@ -15,4 +15,7 @@ class Cow extends BaseLivingEntity
 
     protected bool $canProduceNaturalResources = true;
     protected array $produceNaturalResourcesCollection = [Milk::class, Meat::class];
+
+    protected bool $isMovable = true;
+    protected float $entitySpeed = 1.0;
 }

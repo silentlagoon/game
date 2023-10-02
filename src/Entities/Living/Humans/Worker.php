@@ -14,4 +14,7 @@ class Worker extends BaseLivingEntity
     protected bool $shouldConsumeFood = true;
     protected int $consumeFoodAmount = 2;
     protected int $hungerDamage = 30;
+
+    protected bool $isMovable = true;
+    protected float $entitySpeed = 2.0;
 }

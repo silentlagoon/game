@@ -30,6 +30,7 @@ $digestor = new Digestor($gameState, [], new TimesOfYear(), 1);
 $entitiesFactory = new EntitiesFactory();
 
 //TODO:: Remove me, testing purposes only
+    $gameState->addGoldAmount(1000);
     $digestor->addEntity($entitiesFactory->createEntityOfType(HumanWorker::class, $gameState, 5));
     $digestor->addEntity($entitiesFactory->createEntityOfType(Cow::class, $gameState));
     $digestor->addEntity($entitiesFactory->createEntityOfType(SmallHouse::class, $gameState));

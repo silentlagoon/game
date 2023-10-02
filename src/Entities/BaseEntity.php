@@ -2,11 +2,13 @@
 
 namespace App\Entities;
 
+use App\Game;
 use App\GameDate;
 use App\Entities\Contracts\IEntity;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\NaturalResources\Contracts\INaturalResource;
 use App\Periods\Contracts\IPeriod;
+use App\Position\EntityMoveOptions;
 use App\State\GameState;
 
 abstract class BaseEntity implements IEntity
@@ -29,6 +31,13 @@ abstract class BaseEntity implements IEntity
     protected bool $shouldConsumeFood = false;
     protected int $consumeFoodAmount = 0;
     protected int $hungerDamage = 0;
+
+    protected bool $isMovable = false;
+    protected float $initialPositionX = Game::SCREEN_WIDTH / 2;
+    protected float $initialPositionY = Game::SCREEN_HEIGHT / 2;
+    protected float $entitySpeed = 0.0;
+
+    protected EntityMoveOptions $entityMoveOptions;
 
     protected GameDate $dateOfDeath;
     protected GameState $gameState;
@@ -74,6 +83,72 @@ abstract class BaseEntity implements IEntity
         if ($this->shouldConsumeFood()) {
             $this->processFoodConsuming();
         }
+    }
+
+    /**
+     * @return EntityMoveOptions
+     */
+    public function getEntityMoveOptions(): EntityMoveOptions
+    {
+        return $this->entityMoveOptions;
+    }
+
+    public function setEntityMoveOptions(EntityMoveOptions $entityMoveOptions)
+    {
+        $this->entityMoveOptions = $entityMoveOptions;
+    }
+
+    /**
+     * @return float
+     */
+    public function getInitialPositionX(): float
+    {
+        return $this->initialPositionX;
+    }
+
+    /**
+     * @param float $initialPositionX
+     */
+    public function setInitialPositionX(float $initialPositionX): void
+    {
+        $this->initialPositionX = $initialPositionX;
+    }
+
+    /**
+     * @return float
+     */
+    public function getInitialPositionY(): float
+    {
+        return $this->initialPositionY;
+    }
+
+    /**
+     * @param float $initialPositionY
+     */
+    public function setInitialPositionY(float $initialPositionY): void
+    {
+        $this->initialPositionY = $initialPositionY;
+    }
+
+    /**
+     * @return float
+     */
+    public function getEntitySpeed(): float
+    {
+        return $this->entitySpeed;
+    }
+
+    /**
+     * @param float $entitySpeed
+     */
+    public function setEntitySpeed(float $entitySpeed): void
+    {
+        $this->entitySpeed = $entitySpeed;
+    }
+
+    public function canMove(): bool
+    {
+        return $this->isMovable;
     }
 
     public function getHungerDamage(): int

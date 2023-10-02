@@ -4,6 +4,7 @@ namespace App\Entities\Contracts;
 
 use App\GameDate;
 use App\Periods\Contracts\IPeriod;
+use App\Position\EntityMoveOptions;
 use App\State\GameState;
 
 interface IEntity
@@ -23,4 +24,13 @@ interface IEntity
     public function kill(GameDate $date);
     public function getCost(): int;
     public function canProduceNaturalResources(): bool;
+    public function getInitialPositionX(): float;
+    public function setInitialPositionX(float $initialPositionX): void;
+    public function getInitialPositionY(): float;
+    public function setInitialPositionY(float $initialPositionY): void;
+    public function getEntitySpeed(): float;
+    public function setEntitySpeed(float $entitySpeed): void;
+    public function canMove(): bool;
+    public function getEntityMoveOptions(): ?EntityMoveOptions;
+    public function setEntityMoveOptions(EntityMoveOptions $entityMoveOptions);
 }
