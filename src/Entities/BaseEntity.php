@@ -11,6 +11,8 @@ use App\Periods\Contracts\IPeriod;
 use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;
 use App\State\GameState;
+use raylib\Rectangle;
+use raylib\Vector2;
 
 abstract class BaseEntity implements IEntity
 {
@@ -167,6 +169,51 @@ abstract class BaseEntity implements IEntity
     public function canMove(): bool
     {
         return $this->isMovable;
+    }
+
+    public function move(): void
+    {
+        if (!$this->canMove()) {
+            return;
+        }
+
+        $moveOptions = $this->getEntityMoveOptions();
+        $hitPointsOptions = $this->getEntityHitPointsOptions();
+
+        $entityPositionX = $moveOptions->getPosition()->x + $moveOptions->getSpeed()->x;
+        $entityPositionY = $moveOptions->getPosition()->y + $moveOptions->getSpeed()->y;
+
+        $moveOptions->setPosition(new Vector2($entityPositionX, $entityPositionY));
+        $hitPointsBar = $hitPointsOptions->getBar();
+
+
+        $hitPointsOptions->setBar(new Rectangle(
+            $entityPositionX + 5,
+            $entityPositionY - 7,
+            $hitPointsBar->width,
+            $hitPointsBar->height
+        ));
+
+        //Change movement direction if we hit borders
+        if (
+            ($moveOptions->getPosition()->x >= (GetScreenWidth() - $moveOptions->getRadius())) ||
+            ($moveOptions->getPosition()->y <= $moveOptions->getRadius())
+        ) {
+            $entitySpeedX = $moveOptions->getSpeed()->x *= -1.0;
+            $entitySpeedY = $moveOptions->getSpeed()->y;
+
+            $moveOptions->setSpeed(new Vector2($entitySpeedX, $entitySpeedY));
+        }
+
+        if (
+            ($moveOptions->getPosition()->y >= (GetScreenHeight() - $moveOptions->getRadius())) ||
+            ($moveOptions->getPosition()->y <= $moveOptions->getRadius())
+        ) {
+            $entitySpeedX = $moveOptions->getSpeed()->x;
+            $entitySpeedY = $moveOptions->getSpeed()->y *= -1.0;
+
+            $this->getEntityMoveOptions()->setSpeed(new Vector2($entitySpeedX, $entitySpeedY));
+        }
     }
 
     public function getHungerDamage(): int

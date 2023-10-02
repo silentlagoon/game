@@ -145,14 +145,6 @@ class Game
             }
 
             $this->fireMainMenuAction();
-
-            /** @var IEntity[] $entities */
-            $entities = $this->digestor->getEntities();
-            foreach ($entities as $entity) {
-                if ($entity->canMove()) {
-                    $this->moveEntity($entity);
-                }
-            }
         } catch (NotEnoughGoldToSpendException $e) {
             $this->gameState->setError(true);
             $this->gameState->setErrorMessage($e->getMessage());
@@ -209,48 +201,6 @@ class Game
             ->addObject(new Rectangle(270, 200, 225, 50), UsernameFormAction::class);
 
         $usernameFormAction->handle();
-    }
-
-    protected function moveEntity(IEntity $entity)
-    {
-        //Calculate new movement coordinates
-        $moveOptions = $entity->getEntityMoveOptions();
-        $hitPointsOptions = $entity->getEntityHitPointsOptions();
-
-        $entityPositionX = $moveOptions->getPosition()->x + $moveOptions->getSpeed()->x;
-        $entityPositionY = $moveOptions->getPosition()->y + $moveOptions->getSpeed()->y;
-
-        $moveOptions->setPosition(new Vector2($entityPositionX, $entityPositionY));
-        $hitPointsBar = $hitPointsOptions->getBar();
-
-
-        $hitPointsOptions->setBar(new Rectangle(
-            $entityPositionX + 5,
-            $entityPositionY - 7,
-            $hitPointsBar->width,
-            $hitPointsBar->height
-        ));
-
-        //Change movement direction if we hit borders
-        if (
-            ($moveOptions->getPosition()->x >= (GetScreenWidth() - $moveOptions->getRadius())) ||
-            ($moveOptions->getPosition()->y <= $moveOptions->getRadius())
-        ) {
-            $entitySpeedX = $moveOptions->getSpeed()->x *= -1.0;
-            $entitySpeedY = $moveOptions->getSpeed()->y;
-
-            $moveOptions->setSpeed(new Vector2($entitySpeedX, $entitySpeedY));
-        }
-
-        if (
-            ($moveOptions->getPosition()->y >= (GetScreenHeight() - $moveOptions->getRadius())) ||
-            ($moveOptions->getPosition()->y <= $moveOptions->getRadius())
-        ) {
-            $entitySpeedX = $moveOptions->getSpeed()->x;
-            $entitySpeedY = $moveOptions->getSpeed()->y *= -1.0;
-
-            $entity->getEntityMoveOptions()->setSpeed(new Vector2($entitySpeedX, $entitySpeedY));
-        }
     }
 
     /**
@@ -331,6 +281,8 @@ class Game
 
     protected function drawUI()
     {
+        $this->digestor->digestEntitiesMovement();
+
         $currentPeriod = $this->digestor->getTimesOfYear()->getCurrentPeriod();
 
         if ($this->gameState->getDaysFromTicks() > $currentPeriod->getDurationInDays()) {

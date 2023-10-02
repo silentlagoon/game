@@ -36,4 +36,5 @@ interface IEntity
     public function setEntityMoveOptions(EntityMoveOptions $entityMoveOptions);
     public function getEntityHitPointsOptions(): EntityHitPointsOptions;
     public function setEntityHitPointsOptions(EntityHitPointsOptions $entityHitPointsOptions): void;
+    public function move(): void;
 }

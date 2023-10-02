@@ -11,6 +11,7 @@ use App\State\GameState;
 
 class Digestor
 {
+    /** @var $entities IEntity[] */
     protected array $entities;
     protected TimesOfYear $timesOfYear;
     protected int $currentYear;
@@ -26,6 +27,9 @@ class Digestor
 
     public function digestEntities()
     {
+        //Make it more random
+        shuffle($this->entities);
+
         foreach ($this->entities as $key => $entity) {
             $entity->digestPeriod($this->timesOfYear->getCurrentPeriod(), $this->gameState);
 
@@ -35,6 +39,13 @@ class Digestor
         }
 
         $this->currentYear++;
+    }
+
+    public function digestEntitiesMovement()
+    {
+        foreach ($this->entities as $entity) {
+            $entity->move();
+        }
     }
 
     protected function removeEntityFromDigest(IEntity $entity, int $key): void
