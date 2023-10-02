@@ -38,6 +38,9 @@ abstract class BaseEntity implements IEntity
     protected float $initialPositionY = Game::SCREEN_HEIGHT / 2;
     protected float $entitySpeed = 0.0;
 
+    protected  bool $canUseEquipment = false;
+    protected array $EquipmentCollection = [];
+
     protected EntityMoveOptions $entityMoveOptions;
     protected EntityHitPointsOptions $entityHitPointsOptions;
 
@@ -382,4 +385,17 @@ abstract class BaseEntity implements IEntity
 
         return $totalIncome;
     }
-}
+
+    public function canUseEquipment(): bool
+    {
+        return $this->canUseEquipment;
+    }
+
+    public function getEquipmentCollection(): array
+    {
+        return $this->EquipmentCollection;
+    }
+  }
+
+
+

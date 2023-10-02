@@ -32,6 +32,7 @@ interface IEntity
     public function getEntitySpeed(): float;
     public function setEntitySpeed(float $entitySpeed): void;
     public function canMove(): bool;
+    public function canUseEquipment(): bool;
     public function getEntityMoveOptions(): ?EntityMoveOptions;
     public function setEntityMoveOptions(EntityMoveOptions $entityMoveOptions);
     public function getEntityHitPointsOptions(): EntityHitPointsOptions;

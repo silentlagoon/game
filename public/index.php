@@ -38,3 +38,8 @@ $entitiesFactory = new EntitiesFactory();
 
 $game = new Game($gameState, $digestor, $entitiesFactory);
 $game->start();
+
+
+//TODO:: Переделать интсрументы worker должен иметь возможномть использовать инструменты(equipment)
+//TODO:: Интсрументы влияют на производительность труда через индексацию Income
+//TODO:: период у воркера расчитывет инкам учитывая инструменты в эквипмент
