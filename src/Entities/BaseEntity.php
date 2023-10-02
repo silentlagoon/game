@@ -8,6 +8,7 @@ use App\Entities\Contracts\IEntity;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\NaturalResources\Contracts\INaturalResource;
 use App\Periods\Contracts\IPeriod;
+use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;
 use App\State\GameState;
 
@@ -38,6 +39,7 @@ abstract class BaseEntity implements IEntity
     protected float $entitySpeed = 0.0;
 
     protected EntityMoveOptions $entityMoveOptions;
+    protected EntityHitPointsOptions $entityHitPointsOptions;
 
     protected GameDate $dateOfDeath;
     protected GameState $gameState;
@@ -83,6 +85,22 @@ abstract class BaseEntity implements IEntity
         if ($this->shouldConsumeFood()) {
             $this->processFoodConsuming();
         }
+    }
+
+    /**
+     * @return EntityHitPointsOptions
+     */
+    public function getEntityHitPointsOptions(): EntityHitPointsOptions
+    {
+        return $this->entityHitPointsOptions;
+    }
+
+    /**
+     * @param EntityHitPointsOptions $entityHitPointsOptions
+     */
+    public function setEntityHitPointsOptions(EntityHitPointsOptions $entityHitPointsOptions): void
+    {
+        $this->entityHitPointsOptions = $entityHitPointsOptions;
     }
 
     /**

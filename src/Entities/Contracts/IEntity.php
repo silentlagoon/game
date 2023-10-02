@@ -4,6 +4,7 @@ namespace App\Entities\Contracts;
 
 use App\GameDate;
 use App\Periods\Contracts\IPeriod;
+use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;
 use App\State\GameState;
 
@@ -33,4 +34,6 @@ interface IEntity
     public function canMove(): bool;
     public function getEntityMoveOptions(): ?EntityMoveOptions;
     public function setEntityMoveOptions(EntityMoveOptions $entityMoveOptions);
+    public function getEntityHitPointsOptions(): EntityHitPointsOptions;
+    public function setEntityHitPointsOptions(EntityHitPointsOptions $entityHitPointsOptions): void;
 }

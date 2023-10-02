@@ -11,6 +11,7 @@ use App\Enums\Sounds;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\Position\EntityMoveOptions;
 use App\State\GameState;
+use App\State\ObjectActions\HitPointsAction;
 use App\State\ObjectActions\MainMenuAction;
 use App\State\ObjectActions\UsernameFormAction;
 use raylib\Color;
@@ -212,13 +213,25 @@ class Game
 
     protected function moveEntity(IEntity $entity)
     {
+        //Calculate new movement coordinates
         $moveOptions = $entity->getEntityMoveOptions();
+        $hitPointsOptions = $entity->getEntityHitPointsOptions();
 
         $entityPositionX = $moveOptions->getPosition()->x + $moveOptions->getSpeed()->x;
         $entityPositionY = $moveOptions->getPosition()->y + $moveOptions->getSpeed()->y;
 
         $moveOptions->setPosition(new Vector2($entityPositionX, $entityPositionY));
+        $hitPointsBar = $hitPointsOptions->getBar();
 
+
+        $hitPointsOptions->setBar(new Rectangle(
+            $entityPositionX + 5,
+            $entityPositionY - 7,
+            $hitPointsBar->width,
+            $hitPointsBar->height
+        ));
+
+        //Change movement direction if we hit borders
         if (
             ($moveOptions->getPosition()->x >= (GetScreenWidth() - $moveOptions->getRadius())) ||
             ($moveOptions->getPosition()->y <= $moveOptions->getRadius())
@@ -316,11 +329,6 @@ class Game
         }
     }
 
-    protected function drawHitPoints()
-    {
-
-    }
-
     protected function drawUI()
     {
         $currentPeriod = $this->digestor->getTimesOfYear()->getCurrentPeriod();
@@ -340,6 +348,8 @@ class Game
         $this->drawDeadWorkers($initialEntityPositionY);
 
         $this->drawMainMenu();
+
+        $this->drawHitPoints();
     }
 
     /**
@@ -573,6 +583,27 @@ class Game
             $positionX = (int)( $element->x + $element->width / 2 - MeasureText($text, 10)/2);
             $positionY = (int) $element->y + 11;
             DrawText($text, $positionX, $positionY, 10, $isMouseOver ? Color::DARKBLUE() : Color::DARKGRAY());
+        }
+    }
+
+    protected function drawHitPoints()
+    {
+        /** @var IEntity[] $entities */
+        $entities = $this->digestor->getEntities();
+
+        foreach ($entities as $entity) {
+            $hitPointsOptions = $entity->getEntityHitPointsOptions();
+            $hitPointsBar = $hitPointsOptions->getBar();
+
+            //Calculate Hitpoins dimensions change (if hitpoins goes up/down the bar dimensions must be increased/decreased)
+            $hitPointsBarPerPercent = $hitPointsBar->width / 100;
+            $entityCurrentHitPointsPercent = $entity->getCurrentHitPointsPercent();
+
+            $hitPointsBarNewWidth = $entityCurrentHitPointsPercent * $hitPointsBarPerPercent;
+
+            $newBar = new Rectangle($hitPointsBar->x, $hitPointsBar->y, $hitPointsBarNewWidth, $hitPointsBar->height);
+            DrawRectangleRec($newBar, Color::MAROON());
+            DrawRectangleLines($hitPointsBar->x, $hitPointsBar->y, $hitPointsBar->width, $hitPointsBar->height, Color::SKYBLUE());
         }
     }
 }

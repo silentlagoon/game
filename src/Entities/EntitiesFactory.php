@@ -5,9 +5,11 @@ namespace App\Entities;
 use App\Entities\Contracts\IEntity;
 use App\Entities\Living\Humans\Worker;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;
 use App\State\GameState;
 use Nubs\RandomNameGenerator\All;
+use raylib\Rectangle;
 use raylib\Vector2;
 
 class EntitiesFactory
@@ -37,9 +39,19 @@ class EntitiesFactory
             ));
         }
 
+
         if (!is_null($hitPoints)) {
             $entity->setCurrentHitPoints($hitPoints);
         }
+
+        $entity->setEntityHitPointsOptions(new EntityHitPointsOptions(
+            new Rectangle(
+                $entity->getInitialPositionX() + 5,
+                $entity->getInitialPositionY() - 7,
+                15,
+                5
+            )
+        ));
 
         if (!empty($name)) {
             $entity->setName($name);
