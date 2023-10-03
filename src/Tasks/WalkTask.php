@@ -24,7 +24,9 @@ class WalkTask implements ITask
             $moveOptions->getPosition()->x === $this->getDirection()->x &&
             $moveOptions->getPosition()->y === $this->getDirection()->y
         ) {
+            dump('Task stopped');
             $entity->setTask(null);
+            dump($entity->getTaskQueue());
             return;
         }
 

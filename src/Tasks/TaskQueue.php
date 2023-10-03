@@ -24,7 +24,7 @@ class TaskQueue
 
     public function getNext(): ITask
     {
-        return reset($this->tasks);
+        return array_shift($this->tasks);
     }
 
     public function clear(): void
