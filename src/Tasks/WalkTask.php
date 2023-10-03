@@ -20,9 +20,6 @@ class WalkTask implements ITask
         $moveOptions = $entity->getMoveOptions();
         $hitPointsOptions = $entity->getEntityHitPointsOptions();
 
-        dump('position', $moveOptions->getPosition());
-        dump('direction', $this->getDirection());
-
         if (
             $moveOptions->getPosition()->x === $this->getDirection()->x &&
             $moveOptions->getPosition()->y === $this->getDirection()->y

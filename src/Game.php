@@ -27,6 +27,8 @@ class Game
 
     const MENU_ELEMENT_HEIGHT = 30;
     const MENU_ELEMENT_WIDTH = 150;
+    const USERNAME_INPUT_HEIGHT = 50;
+    const USERNAME_INPUT_WIDTH = 225;
 
     protected Color $colorLightGray;
     protected Color $colorGray;
@@ -252,8 +254,15 @@ class Game
     protected function fireUsernameAction(): void
     {
         $usernameFormAction = new UsernameFormAction($this->gameState, $this->digestor, $this->entitiesFactory);
+        $rectanglePositionX = GetScreenWidth() / 2 -  self::USERNAME_INPUT_WIDTH / 2;
+        $rectanglePositionY = GetScreenHeight() / 2;
         $this->gameState->getGameStateObjects()
-            ->addObject(new Rectangle(270, 200, 225, 50), UsernameFormAction::class);
+            ->addObject(new Rectangle(
+                $rectanglePositionX,
+                $rectanglePositionY,
+                static::USERNAME_INPUT_WIDTH,
+                static::USERNAME_INPUT_HEIGHT
+            ), UsernameFormAction::class);
 
         $usernameFormAction->handle();
     }
@@ -304,36 +313,47 @@ class Game
 
     protected function drawUsernameForm()
     {
-        DrawText('Enter your user name:', 260, 140, 20, $this->colorGray);
+        $usernameTextFontSize = 20;
+        $explainText = 'Enter your user name:';
+        $positionX = (int) (GetScreenWidth() / 2 - self::USERNAME_INPUT_WIDTH + MeasureText($explainText, $usernameTextFontSize)) - self::USERNAME_INPUT_WIDTH / 2;
+        $positionY = (int) (GetScreenHeight() / 2 - self::USERNAME_INPUT_HEIGHT);
+        DrawText($explainText, (int) $positionX, (int) $positionY, $usernameTextFontSize, $this->colorGray);
 
         $usernameForm = $this->gameState->getGameStateObjects()->getObject(UsernameFormAction::class);
         DrawRectangleRec($usernameForm, $this->colorLightGray);
 
         $isMouseOnText = CheckCollisionPointRec(GetMousePosition(), $usernameForm);
 
+        DrawRectangleLines(
+            (int) $usernameForm->x,
+            (int) $usernameForm->y,
+            (int) $usernameForm->width,
+            (int) $usernameForm->height,
+            $isMouseOnText ? Color::RED() : $this->colorGray
+        );
+
+        DrawText(
+            $this->gameState->getUserName(),
+            (int) $usernameForm->x + 5,
+            (int) $usernameForm->y + 8,
+            40,
+            Color::RED()
+        );
+
         if ($isMouseOnText) {
-            DrawRectangleLines(
-                (int) $usernameForm->x,
-                (int) $usernameForm->y,
-                (int) $usernameForm->width,
-                (int) $usernameForm->height,
+            DrawText(
+                "_",
+                (int) $usernameForm->x + 8 + MeasureText($this->gameState->getUserName(), 40),
+                (int) $usernameForm->y + 12,
+                40,
                 Color::RED()
             );
-        } else {
-            DrawRectangleLines(
-                (int) $usernameForm->x,
-                (int) $usernameForm->y,
-                (int) $usernameForm->width,
-                (int) $usernameForm->height,
-                $this->colorGray
-            );
-        }
 
-        DrawText($this->gameState->getUserName(), (int) $usernameForm->x + 5, (int) $usernameForm->y + 8, 40, Color::RED());
-
-        if ($isMouseOnText) {
-            DrawText("_", (int) $usernameForm->x + 8 + MeasureText($this->gameState->getUserName(), 40), (int) $usernameForm->y + 12, 40, Color::RED());
-            DrawText('Press BACKSPACE to delete chars...', 230, 300, 20, $this->colorGray);
+            $explainTextFontSize = 20;
+            $explainText = 'Press BACKSPACE to delete chars...';
+            $positionX = (int) (GetScreenWidth() / 2 + self::USERNAME_INPUT_WIDTH - MeasureText($explainText, $explainTextFontSize) + $usernameTextFontSize * 4) - self::USERNAME_INPUT_WIDTH / 2;
+            $positionY = (int) (GetScreenHeight() / 2 + self::USERNAME_INPUT_HEIGHT + $usernameTextFontSize);
+            DrawText($explainText, (int) $positionX, (int) $positionY, $explainTextFontSize, $this->colorGray);
         }
     }
 
