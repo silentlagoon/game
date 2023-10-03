@@ -5,6 +5,9 @@ namespace App;
 use App\Entities\Contracts\IEntity;
 use App\Entities\EntitiesAllowedToBuy;
 use App\Entities\EntitiesFactory;
+use App\Entities\Living\Humans\Worker as HumanWorker;
+use App\Entities\Living\Animals\Cow;
+use App\Entities\Structures\SmallHouse;
 use App\Enums\Sounds;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 use App\State\GameState;
@@ -100,6 +103,24 @@ class Game
             $this->initSounds();
 
             $this->gameTextures = $this->loadTextures();
+
+            //TODO:: DElete me
+            $workerEntity = $this->entitiesFactory->createEntityOfType(HumanWorker::class, $this->gameState, 5);
+            $workerEntity->getMoveOptions()
+                ->setTexture($this->gameTextures->getEntityTexture($workerEntity));
+            $this->digestor->addEntity($workerEntity);
+
+            $cowEntity = $this->entitiesFactory->createEntityOfType(Cow::class, $this->gameState);
+            $cowEntity->getMoveOptions()
+                ->setTexture($this->gameTextures->getEntityTexture($cowEntity));
+            $this->digestor->addEntity($cowEntity);
+
+            $smallHouseEntity = $this->entitiesFactory->createEntityOfType(SmallHouse::class, $this->gameState);
+            $smallHouseEntity->getMoveOptions()
+                ->setTexture($this->gameTextures->getEntityTexture($smallHouseEntity));
+            $this->digestor->addEntity($smallHouseEntity);
+
+            //TODO:: DElete me
 
             SetTargetFPS(static::TARGET_FPS);
 
@@ -253,7 +274,7 @@ class Game
 
     protected function fireUsernameAction(): void
     {
-        $usernameFormAction = new UsernameFormAction($this->gameState, $this->digestor, $this->entitiesFactory);
+        $usernameFormAction = new UsernameFormAction($this->gameState, $this->digestor, $this->entitiesFactory, $this->gameTextures);
         $rectanglePositionX = GetScreenWidth() / 2 -  self::USERNAME_INPUT_WIDTH / 2;
         $rectanglePositionY = GetScreenHeight() / 2;
         $this->gameState->getGameStateObjects()
@@ -285,7 +306,13 @@ class Game
             $elements[$formElementName] = new Rectangle($startPositionX, $positionY, 150, static::MENU_ELEMENT_HEIGHT);
         }
 
-        $mainMenuAction = new MainMenuAction($this->gameState, $this->digestor, $this->entitiesFactory);
+        $mainMenuAction = new MainMenuAction(
+            $this->gameState,
+            $this->digestor,
+            $this->entitiesFactory,
+            $this->gameTextures
+        );
+
         $this->gameState->getGameStateObjects()
             ->addObject($elements, MainMenuAction::class);
 

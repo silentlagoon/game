@@ -28,20 +28,52 @@ class WalkTask implements ITask
             return;
         }
 
+        $entityPositionX = $moveOptions->getPosition()->x;
+
         if($moveOptions->getPosition()->x > $this->getDirection()->x) {
-            $entityPositionX = $moveOptions->getPosition()->x - $moveOptions->getSpeed()->x;
-        } else if ($moveOptions->getPosition()->x < $this->getDirection()->x){
-            $entityPositionX = $moveOptions->getPosition()->x + $moveOptions->getSpeed()->x;
-        } else {
-            $entityPositionX = $moveOptions->getPosition()->x;
+
+            $resultSpeedX = $moveOptions->getSpeed()->x;
+            $measureDistanceToPoint = $moveOptions->getPosition()->x - $this->getDirection()->x;
+
+            if ($measureDistanceToPoint < $moveOptions->getSpeed()->x) {
+                $entityPositionX = $this->getDirection()->x;
+            } else {
+                $entityPositionX = $moveOptions->getPosition()->x - $resultSpeedX;
+            }
+        } else if ($moveOptions->getPosition()->x < $this->getDirection()->x) {
+
+            $resultSpeedX = $moveOptions->getSpeed()->x;
+            $measureDistanceToPoint = $this->getDirection()->x - $moveOptions->getPosition()->x;
+
+            if ($measureDistanceToPoint < $moveOptions->getSpeed()->x) {
+                $entityPositionX = $this->getDirection()->x;
+            } else {
+                $entityPositionX = $moveOptions->getPosition()->x + $resultSpeedX;
+            }
         }
 
+        $entityPositionY = $moveOptions->getPosition()->y;
+
         if ($moveOptions->getPosition()->y > $this->getDirection()->y) {
-            $entityPositionY = $moveOptions->getPosition()->y - $moveOptions->getSpeed()->y;
+
+            $resultSpeedY = $moveOptions->getSpeed()->y;
+            $measureDistanceToPoint = $moveOptions->getPosition()->y - $this->getDirection()->y;
+
+            if ($measureDistanceToPoint < $moveOptions->getSpeed()->y) {
+                $entityPositionY = $this->getDirection()->y;
+            } else {
+                $entityPositionY = $moveOptions->getPosition()->y - $resultSpeedY;
+            }
         } elseif ($moveOptions->getPosition()->y < $this->getDirection()->y) {
-            $entityPositionY = $moveOptions->getPosition()->y + $moveOptions->getSpeed()->y;
-        } else {
-            $entityPositionY = $moveOptions->getPosition()->y;
+
+            $resultSpeedY = $moveOptions->getSpeed()->y;
+            $measureDistanceToPoint = $this->getDirection()->y - $moveOptions->getPosition()->y;
+
+            if ($measureDistanceToPoint < $moveOptions->getSpeed()->y) {
+                $entityPositionY = $this->getDirection()->y;
+            } else {
+                $entityPositionY = $moveOptions->getPosition()->y + $resultSpeedY;
+            }
         }
 
         $moveOptions->setPosition(new Vector2($entityPositionX, $entityPositionY));

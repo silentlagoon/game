@@ -21,7 +21,9 @@ class MainMenuAction extends ApplicationObjectAction
             {
                 if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
                 {
-                    $this->digestor->addEntity($this->entitiesFactory->createEntityOfType($name, $this->gameState));
+                    $entity = $this->entitiesFactory->createEntityOfType($name, $this->gameState);
+                    $entity->getMoveOptions()->setTexture($this->gameTextures->getEntityTexture($entity));
+                    $this->digestor->addEntity($entity);
                 }
             }
         }

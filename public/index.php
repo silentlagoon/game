@@ -2,9 +2,6 @@
 
 use App\Digestor;
 use App\Entities\EntitiesFactory;
-use App\Entities\Living\Humans\Worker as HumanWorker;
-use App\Entities\Living\Animals\Cow;
-use App\Entities\Structures\SmallHouse;
 use App\Game;
 use App\Periods\TimesOfYear;
 use App\State\GameState;
@@ -28,13 +25,6 @@ $gameState->setUserName($userName)
 
 $digestor = new Digestor($gameState, [], [], new TimesOfYear(), 1);
 $entitiesFactory = new EntitiesFactory();
-
-//TODO:: Remove me, testing purposes only
-    $gameState->addGoldAmount(1000);
-    $digestor->addEntity($entitiesFactory->createEntityOfType(HumanWorker::class, $gameState, 5));
-    $digestor->addEntity($entitiesFactory->createEntityOfType(Cow::class, $gameState));
-    $digestor->addEntity($entitiesFactory->createEntityOfType(SmallHouse::class, $gameState));
-//TODO:: Remove me, testing purposes only
 
 $game = new Game($gameState, $digestor, $entitiesFactory);
 $game->start();

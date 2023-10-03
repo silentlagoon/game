@@ -46,5 +46,4 @@ interface IEntity
     public function getTaskQueue(): TaskQueue;
     public function setTaskQueue(TaskQueue $taskQueue);
     public function digestTasks();
-
 }

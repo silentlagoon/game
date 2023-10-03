@@ -13,7 +13,6 @@ use App\Position\EntityMoveOptions;
 use App\State\GameState;
 use App\Tasks\Contracts\ITask;
 use App\Tasks\TaskQueue;
-use App\Tasks\WalkTask;
 use raylib\Rectangle;
 use raylib\Vector2;
 
@@ -237,8 +236,8 @@ abstract class BaseEntity implements IEntity
 
         //Change movement direction if we hit borders
         if (
-            ($moveOptions->getPosition()->x >= (GetScreenWidth() - $moveOptions->getRadius())) ||
-            ($moveOptions->getPosition()->y <= $moveOptions->getRadius())
+            ($moveOptions->getPosition()->x >= (GetScreenWidth() - $moveOptions->getTexture()->width)) ||
+            ($moveOptions->getPosition()->y <= $moveOptions->getTexture()->height)
         ) {
             $entitySpeedX = $moveOptions->getSpeed()->x *= -1.0;
             $entitySpeedY = $moveOptions->getSpeed()->y;
@@ -247,8 +246,8 @@ abstract class BaseEntity implements IEntity
         }
 
         if (
-            ($moveOptions->getPosition()->y >= (GetScreenHeight() - $moveOptions->getRadius())) ||
-            ($moveOptions->getPosition()->y <= $moveOptions->getRadius())
+            ($moveOptions->getPosition()->y >= (GetScreenHeight() - $moveOptions->getTexture()->height)) ||
+            ($moveOptions->getPosition()->x <= $moveOptions->getTexture()->width)
         ) {
             $entitySpeedX = $moveOptions->getSpeed()->x;
             $entitySpeedY = $moveOptions->getSpeed()->y *= -1.0;

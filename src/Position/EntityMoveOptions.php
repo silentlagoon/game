@@ -2,13 +2,14 @@
 
 namespace App\Position;
 
+use raylib\Texture;
 use raylib\Vector2;
 
 class EntityMoveOptions
 {
     protected Vector2 $position;
     protected Vector2 $speed;
-    protected float $radius = 5.0;
+    protected ?Texture $texture = null;
 
     public function __construct(Vector2 $position, Vector2 $speed)
     {
@@ -49,10 +50,15 @@ class EntityMoveOptions
     }
 
     /**
-     * @return float
+     * @return Texture|null
      */
-    public function getRadius(): float
+    public function getTexture(): ?Texture
     {
-        return $this->radius;
+        return $this->texture;
+    }
+
+    public function setTexture(Texture $texture)
+    {
+        $this->texture = $texture;
     }
 }
