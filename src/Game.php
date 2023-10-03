@@ -5,33 +5,28 @@ namespace App;
 use App\Entities\Contracts\IEntity;
 use App\Entities\EntitiesAllowedToBuy;
 use App\Entities\EntitiesFactory;
-use App\Entities\Living\Animals\Cow;
-use App\Entities\Living\Humans\Worker;
 use App\Enums\Sounds;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
-use App\Position\EntityMoveOptions;
 use App\State\GameState;
-use App\State\ObjectActions\HitPointsAction;
 use App\State\ObjectActions\MainMenuAction;
 use App\State\ObjectActions\UsernameFormAction;
 use App\Tasks\MoveTask;
 use App\Tasks\WalkTask;
 use raylib\Color;
 use raylib\Rectangle;
-use raylib\Vector2;
 use const raylib\KeyboardKey\KEY_SPACE;
 use const raylib\MouseButton\MOUSE_BUTTON_LEFT;
 use const raylib\MouseButton\MOUSE_BUTTON_RIGHT;
 
 class Game
 {
-    const SCREEN_WIDTH  = 800;
-    const SCREEN_HEIGHT = 450;
+    const SCREEN_WIDTH  = 1920;
+    const SCREEN_HEIGHT = 1080;
     const TARGET_FPS = 60;
-    const INVENTORY_POSITION_Y = 30;
     const WORKERS_UI_STEPPING_Y = 20;
 
-    const USERNAME_FORM = 'username_form';
+    const MENU_ELEMENT_HEIGHT = 30;
+    const MENU_ELEMENT_WIDTH = 150;
 
     protected Color $colorLightGray;
     protected Color $colorGray;
@@ -270,12 +265,15 @@ class Game
     protected function fireMainMenuAction(): void
     {
         $elements = [];
-        $form = EntitiesAllowedToBuy::get();
+        $form = array_unique(EntitiesAllowedToBuy::get());
+
+        $maxHeight = count($form) * static::MENU_ELEMENT_HEIGHT + 5;
+        $startPositionX = GetScreenWidth() - 5 - static::MENU_ELEMENT_WIDTH;
+        $startPositionY = GetScreenHeight() - $maxHeight;
 
         foreach ($form as $key => $formElementName) {
-            $height = 30;
-            $positionY = 340 + ($height * $key) + $key;
-            $elements[$formElementName] = new Rectangle(630, $positionY, 150, $height);
+            $positionY = $startPositionY + (static::MENU_ELEMENT_HEIGHT * $key) + $key;
+            $elements[$formElementName] = new Rectangle($startPositionX, $positionY, 150, static::MENU_ELEMENT_HEIGHT);
         }
 
         $mainMenuAction = new MainMenuAction($this->gameState, $this->digestor, $this->entitiesFactory);
@@ -601,13 +599,16 @@ class Game
             $isMouseOver = CheckCollisionPointRec(GetMousePosition(), $element);
             $text = sprintf('Buy %s - %dg.', $entityClass, $entityClass->getCost());
 
+            $rectangleColor = Color::MAROON();
+            $rectangleLinesColor = Color::MAROON();
+
             if ($this->gameState->isEnoughGoldToBuy($entityClass)) {
-                DrawRectangleRec($element, $isMouseOver ? Color::SKYBLUE() : Color::LIGHTGRAY());
-                DrawRectangleLines($element->x, $element->y, $element->width, $element->height, $isMouseOver ? Color::BLUE() : Color::GRAY());
-            } else {
-                DrawRectangleRec($element, Color::MAROON());
-                DrawRectangleLines($element->x, $element->y, $element->width, $element->height, Color::MAROON());
+                $rectangleColor = $isMouseOver ? Color::SKYBLUE() : Color::LIGHTGRAY();
+                $rectangleLinesColor = $isMouseOver ? Color::BLUE() : Color::GRAY();
             }
+
+            DrawRectangleRec($element, $rectangleColor);
+            DrawRectangleLines($element->x, $element->y, $element->width, $element->height, $rectangleLinesColor);
 
             $positionX = (int)( $element->x + $element->width / 2 - MeasureText($text, 10)/2);
             $positionY = (int) $element->y + 11;

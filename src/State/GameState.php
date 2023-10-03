@@ -24,6 +24,8 @@ class GameState
 
     protected array $workersGraveyard = [];
 
+    protected int $population = 0;
+
     protected int $ticks = 1;
 
     protected bool $error = false;
@@ -334,5 +336,15 @@ class GameState
     public function isEnoughGoldToBuy(IEntity $entity): bool
     {
         return $this->currentGoldAmount >= $entity->getCost();
+    }
+
+    public function getPopulation(): int
+    {
+        return $this->population;
+    }
+
+    public function incrementPopulation($increment = 1)
+    {
+        $this->population += $increment;
     }
 }

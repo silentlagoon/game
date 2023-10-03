@@ -82,6 +82,10 @@ class Digestor
         if ($entity instanceof SmallHouse) {
             $this->gameState->incrementTotalHousesOwned();
         }
+
+        if ($entity instanceof IPopulation) {
+            $this->gameState->incrementPopulation();
+        }
     }
 
     public function getTimesOfYear(): TimesOfYear

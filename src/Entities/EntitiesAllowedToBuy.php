@@ -13,7 +13,7 @@ class EntitiesAllowedToBuy
         return [
             Cow::class,
             Worker::class,
-            SmallHouse::class
+            SmallHouse::class,
         ];
     }
 }
