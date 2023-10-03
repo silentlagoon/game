@@ -107,7 +107,7 @@ class Game
 
             while (!WindowShouldClose()) {
 
-                UpdateMusicStream($this->gameState->getGameStateSounds()->getObject(Sounds::INTRO()->getValue()));
+                //UpdateMusicStream($this->gameState->getGameStateSounds()->getObject(Sounds::INTRO()->getValue()));
 
                 $this->startUpdatePhase();
 

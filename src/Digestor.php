@@ -57,15 +57,6 @@ class Digestor
         }
     }
 
-    public function clearSelectedEntities()
-    {
-        foreach ($this->entitiesSelected as $entity) {
-            $entity->setSelected(false);
-        }
-
-        $this->entitiesSelected = [];
-    }
-
     public function addEntity(IEntity $entity): void
     {
         $this->entities[] = $entity;
@@ -81,17 +72,6 @@ class Digestor
         if ($entity instanceof SmallHouse) {
             $this->gameState->incrementTotalHousesOwned();
         }
-    }
-
-    public function selectEntity(IEntity $entity): void
-    {
-        $entity->setSelected(true);
-        $this->entitiesSelected[] = $entity;
-    }
-
-    public function getEntitiesSelected(): array
-    {
-        return $this->entitiesSelected;
     }
 
     public function getTimesOfYear(): TimesOfYear
