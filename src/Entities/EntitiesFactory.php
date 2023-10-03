@@ -33,13 +33,10 @@ class EntitiesFactory
         /** @var IEntity $entity */
         $entity = new $entity($gameState);
 
-        if ($entity->canMove()) {
-            $entity->setEntityMoveOptions(new EntityMoveOptions(
-                new Vector2($entity->getInitialPositionX(), $entity->getInitialPositionY()),
-                new Vector2($entity->getEntitySpeed(), $entity->getEntitySpeed())
-            ));
-        }
-
+        $entity->setEntityMoveOptions(new EntityMoveOptions(
+            new Vector2($entity->getInitialPositionX(), $entity->getInitialPositionY()),
+            new Vector2($entity->getEntitySpeed(), $entity->getEntitySpeed())
+        ));
 
         if (!is_null($hitPoints)) {
             $entity->setCurrentHitPoints($hitPoints);

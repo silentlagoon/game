@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Entities\Contracts\IEntity;
+use App\Entities\Living\Humans\Contracts\IPopulation;
 use App\Entities\Living\Humans\Worker;
 use App\Entities\Living\Animals\Cow;
 use App\Entities\Structures\SmallHouse;
@@ -55,6 +56,15 @@ class Digestor
         foreach ($this->entities as $entity) {
             $entity->digestTasks();
         }
+    }
+
+    public function getPopulation(): int
+    {
+        $population = array_filter($this->entities, function (IEntity $entity) {
+            return $entity instanceof IPopulation;
+        });
+
+        return count($population);
     }
 
     public function addEntity(IEntity $entity): void

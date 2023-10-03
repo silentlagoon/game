@@ -20,13 +20,14 @@ class WalkTask implements ITask
         $moveOptions = $entity->getMoveOptions();
         $hitPointsOptions = $entity->getEntityHitPointsOptions();
 
+        dump('position', $moveOptions->getPosition());
+        dump('direction', $this->getDirection());
+
         if (
             $moveOptions->getPosition()->x === $this->getDirection()->x &&
             $moveOptions->getPosition()->y === $this->getDirection()->y
         ) {
-            dump('Task stopped');
             $entity->setTask(null);
-            dump($entity->getTaskQueue());
             return;
         }
 
@@ -47,8 +48,6 @@ class WalkTask implements ITask
         }
 
         $moveOptions->setPosition(new Vector2($entityPositionX, $entityPositionY));
-
-        dump($moveOptions, $this->getDirection());
 
         $hitPointsBar = $hitPointsOptions->getBar();
 

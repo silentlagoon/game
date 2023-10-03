@@ -3,8 +3,9 @@
 namespace App\Entities\Living\Humans;
 
 use App\Entities\Living\BaseLivingEntity;
+use App\Entities\Living\Humans\Contracts\IPopulation;
 
-class Worker extends BaseLivingEntity
+class Worker extends BaseLivingEntity implements IPopulation
 {
     protected int $maxHitPoints = 100;
     protected int $currentHitPoints = 100;

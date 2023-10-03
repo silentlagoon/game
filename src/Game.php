@@ -14,6 +14,7 @@ use App\State\GameState;
 use App\State\ObjectActions\HitPointsAction;
 use App\State\ObjectActions\MainMenuAction;
 use App\State\ObjectActions\UsernameFormAction;
+use App\Tasks\MoveTask;
 use App\Tasks\WalkTask;
 use raylib\Color;
 use raylib\Rectangle;
@@ -150,14 +151,15 @@ class Game
             $this->fireMainMenuAction();
 
             foreach ($this->digestor->getEntities() as $entity) {
-                if ($entity->canMove()) {
-                    $entityPosition = $entity->getMoveOptions()->getPosition();
-                    $texture = $this->gameTextures->getEntityTexture($entity);
-                    $isMouseOnEntity = CheckCollisionPointRec(
-                        GetMousePosition(),
-                        new Rectangle($entityPosition->x, $entityPosition->y, $texture->width, $texture->height)
-                    );
+                $entityPosition = $entity->getMoveOptions()->getPosition();
+                $texture = $this->gameTextures->getEntityTexture($entity);
 
+                $isMouseOnEntity = CheckCollisionPointRec(
+                    GetMousePosition(),
+                    new Rectangle($entityPosition->x, $entityPosition->y, $texture->width, $texture->height)
+                );
+
+                if ($entity->canMove()) {
                     if ($isMouseOnEntity) {
                         if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
                             $entity->setSelected(true);
@@ -165,6 +167,10 @@ class Game
                     }
 
                     if (!$isMouseOnEntity) {
+                        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+                            $entity->setSelected(false);
+                        }
+
                         if ($entity->isSelected()) {
                             if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
                                 $walkTask = new WalkTask();
@@ -178,6 +184,22 @@ class Game
                                 }
 
                                 $entity->getTaskQueue()->push($walkTask);
+                            }
+                        }
+                    }
+                }
+
+                if (!$entity->canMove()) {
+                    if ($isMouseOnEntity) {
+                        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+                            $entity->setSelected(!$entity->isSelected());
+                            if (!$entity->isSelected()) {
+                                $entity->setTask(null);
+                            } else {
+                                if ($entity->isSelected()) {
+                                    $moveTask = new MoveTask();
+                                    $entity->getTaskQueue()->push($moveTask);
+                                }
                             }
                         }
                     }
@@ -427,7 +449,18 @@ class Game
             $inventoryFontSize, Color::BLUE()
         );
 
-        return $initialDrawInventoryPosition + $inventoryFontSize + $inventorySpaceAfter;
+        $nexPosition = $initialDrawInventoryPosition + $inventoryFontSize + $inventorySpaceAfter;
+
+        DrawText(
+            sprintf('Population: %d',
+                $this->digestor->getPopulation()
+            ),
+            5,
+            $nexPosition,
+            $inventoryFontSize, Color::BLUE()
+        );
+
+        return $nexPosition + $inventoryFontSize + $inventorySpaceAfter;
     }
 
     protected function drawDeadWorkers(int &$initialWorkersPositionY)
@@ -451,8 +484,8 @@ class Game
             if ($deadWorker->canMove()) {
                 DrawTexture(
                     $this->gameTextures->getEntityTexture($deadWorker),
-                    $deadWorker->getMoveOptions()->getPosition()->x,
-                    $deadWorker->getMoveOptions()->getPosition()->y,
+                    (int) $deadWorker->getMoveOptions()->getPosition()->x,
+                    (int) $deadWorker->getMoveOptions()->getPosition()->y,
                     Color::MAROON()
                 );
             }
@@ -508,14 +541,12 @@ class Game
                     Color::GREEN()
                 );
 
-                if ($entity->canMove()) {
-                    DrawTexture(
-                        $this->gameTextures->getEntityTexture($entity),
-                        $entity->getMoveOptions()->getPosition()->x,
-                        $entity->getMoveOptions()->getPosition()->y,
-                        Color::GREEN()
-                    );
-                }
+                DrawTexture(
+                    $this->gameTextures->getEntityTexture($entity),
+                    (int) $entity->getMoveOptions()->getPosition()->x,
+                    (int) $entity->getMoveOptions()->getPosition()->y,
+                    Color::GREEN()
+                );
 
             }
 
@@ -527,14 +558,12 @@ class Game
                     Color::YELLOW()
                 );
 
-                if ($entity->canMove()) {
-                    DrawTexture(
-                        $this->gameTextures->getEntityTexture($entity),
-                        $entity->getMoveOptions()->getPosition()->x,
-                        $entity->getMoveOptions()->getPosition()->y,
-                        Color::YELLOW()
-                    );
-                }
+                DrawTexture(
+                    $this->gameTextures->getEntityTexture($entity),
+                    (int) $entity->getMoveOptions()->getPosition()->x,
+                    (int) $entity->getMoveOptions()->getPosition()->y,
+                    Color::YELLOW()
+                );
             }
 
             DrawText(
@@ -551,8 +580,8 @@ class Game
 
             if ($entity->isSelected()) {
                 DrawRectangleLines(
-                    $entity->getMoveOptions()->getPosition()->x,
-                    $entity->getMoveOptions()->getPosition()->y,
+                    (int) $entity->getMoveOptions()->getPosition()->x,
+                    (int) $entity->getMoveOptions()->getPosition()->y,
                     $this->gameTextures->getEntityTexture($entity)->width,
                     $this->gameTextures->getEntityTexture($entity)->width,
                     Color::GREEN()
@@ -603,7 +632,7 @@ class Game
 
             $newBar = new Rectangle($hitPointsBar->x, $hitPointsBar->y, $hitPointsBarNewWidth, $hitPointsBar->height);
             DrawRectangleRec($newBar, Color::MAROON());
-            DrawRectangleLines($hitPointsBar->x, $hitPointsBar->y, $hitPointsBar->width, $hitPointsBar->height, Color::SKYBLUE());
+            DrawRectangleLines((int) $hitPointsBar->x, (int) $hitPointsBar->y, $hitPointsBar->width, $hitPointsBar->height, Color::SKYBLUE());
         }
     }
 }
