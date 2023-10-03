@@ -5,6 +5,7 @@ namespace App\Entities;
 use App\Entities\Contracts\IEntity;
 use App\Entities\Living\Humans\Worker;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+use App\Inventory\Inventory;
 use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;
 use App\State\GameState;
@@ -61,6 +62,8 @@ class EntitiesFactory
         }
 
         $entity->setTaskQueue(new TaskQueue());
+
+        $entity->setInventory(new Inventory());
 
         return $entity;
     }

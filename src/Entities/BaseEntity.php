@@ -6,6 +6,8 @@ use App\Game;
 use App\GameDate;
 use App\Entities\Contracts\IEntity;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+use App\Inventory\Inventory;
+use App\Inventory\Items\Coat;
 use App\NaturalResources\Contracts\INaturalResource;
 use App\Periods\Contracts\IPeriod;
 use App\Position\EntityHitPointsOptions;
@@ -51,6 +53,8 @@ abstract class BaseEntity implements IEntity
     protected ?ITask $task = null;
     protected TaskQueue $taskQueue;
     protected bool $isSelected = false;
+
+    protected Inventory $inventory;
 
 
     /**
@@ -453,7 +457,9 @@ abstract class BaseEntity implements IEntity
         $damageHealed = $period->getNatureHealing();
 
         if ($this->canBeDamagedByNature) {
-            $this->receiveDamage($period->getNatureDamage());
+            if (!$this->getInventory()->getItem(Coat::class)) {
+                $this->receiveDamage($period->getNatureDamage());
+            }
         }
 
         if ($this->canBeHealedByNature) {
@@ -478,5 +484,15 @@ abstract class BaseEntity implements IEntity
         }
 
         return $totalIncome;
+    }
+
+    public function getInventory(): Inventory
+    {
+        return $this->inventory;
+    }
+
+    public function setInventory(Inventory $inventory)
+    {
+        $this->inventory = $inventory;
     }
 }

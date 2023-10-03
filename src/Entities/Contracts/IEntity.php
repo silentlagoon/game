@@ -3,6 +3,7 @@
 namespace App\Entities\Contracts;
 
 use App\GameDate;
+use App\Inventory\Inventory;
 use App\Periods\Contracts\IPeriod;
 use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;
@@ -46,4 +47,6 @@ interface IEntity
     public function getTaskQueue(): TaskQueue;
     public function setTaskQueue(TaskQueue $taskQueue);
     public function digestTasks();
+    public function getInventory(): Inventory;
+    public function setInventory(Inventory $inventory);
 }

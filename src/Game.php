@@ -10,6 +10,7 @@ use App\Entities\Living\Animals\Cow;
 use App\Entities\Structures\SmallHouse;
 use App\Enums\Sounds;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+use App\Inventory\Items\Coat;
 use App\State\GameState;
 use App\State\ObjectActions\MainMenuAction;
 use App\State\ObjectActions\UsernameFormAction;
@@ -108,6 +109,7 @@ class Game
             $workerEntity = $this->entitiesFactory->createEntityOfType(HumanWorker::class, $this->gameState, 5);
             $workerEntity->getMoveOptions()
                 ->setTexture($this->gameTextures->getEntityTexture($workerEntity));
+            $workerEntity->getInventory()->addItem(new Coat());
             $this->digestor->addEntity($workerEntity);
 
             $cowEntity = $this->entitiesFactory->createEntityOfType(Cow::class, $this->gameState);
