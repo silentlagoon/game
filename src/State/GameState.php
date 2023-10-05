@@ -21,6 +21,7 @@ class GameState
     protected int $totalHousesOwned = 0;
 
     protected int $currentGoldAmount = 0;
+    protected int $currentResourcesGathered = 0;
 
     protected array $workersGraveyard = [];
 
@@ -221,6 +222,16 @@ class GameState
     public function addGoldAmount(int $amountToAdd): int
     {
         return $this->currentGoldAmount += $amountToAdd;
+    }
+
+    public function addCurrentResourcesGathered(int $amountToAdd): int
+    {
+        return $this->currentResourcesGathered += $amountToAdd;
+    }
+
+    public function getCurrentResourcesGathered(): int
+    {
+        return $this->currentResourcesGathered;
     }
 
     public function addStartingGoldAmount(): int

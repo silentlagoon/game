@@ -16,6 +16,8 @@ use App\State\ObjectActions\MainMenuAction;
 use App\State\ObjectActions\UsernameFormAction;
 use App\Tasks\MoveTask;
 use App\Tasks\WalkTask;
+use App\Workplaces\Mine;
+use App\Workplaces\WorkplacesFactory;
 use raylib\Color;
 use raylib\Rectangle;
 use const raylib\KeyboardKey\KEY_SPACE;
@@ -42,12 +44,19 @@ class Game
     protected GameState $gameState;
     protected Digestor $digestor;
     protected EntitiesFactory $entitiesFactory;
+    protected WorkplacesFactory $workplacesFactory;
 
-    public function __construct(GameState $gameState, Digestor $digestor, EntitiesFactory $entitiesFactory)
+    public function __construct(
+        GameState $gameState,
+        Digestor $digestor,
+        EntitiesFactory $entitiesFactory,
+        WorkplacesFactory $workplacesFactory
+    )
     {
         $this->gameState = $gameState;
         $this->digestor = $digestor;
         $this->entitiesFactory = $entitiesFactory;
+        $this->workplacesFactory = $workplacesFactory;
 
         $this->init();
     }
@@ -106,22 +115,7 @@ class Game
             $this->gameTextures = $this->loadTextures();
 
             //TODO:: DElete me
-            $workerEntity = $this->entitiesFactory->createEntityOfType(HumanWorker::class, $this->gameState, 5);
-            $workerEntity->getMoveOptions()
-                ->setTexture($this->gameTextures->getEntityTexture($workerEntity));
-            $workerEntity->getInventory()->addItem(new Coat());
-            $this->digestor->addEntity($workerEntity);
-
-            $cowEntity = $this->entitiesFactory->createEntityOfType(Cow::class, $this->gameState);
-            $cowEntity->getMoveOptions()
-                ->setTexture($this->gameTextures->getEntityTexture($cowEntity));
-            $this->digestor->addEntity($cowEntity);
-
-            $smallHouseEntity = $this->entitiesFactory->createEntityOfType(SmallHouse::class, $this->gameState);
-            $smallHouseEntity->getMoveOptions()
-                ->setTexture($this->gameTextures->getEntityTexture($smallHouseEntity));
-            $this->digestor->addEntity($smallHouseEntity);
-
+                $this->createMockEntities();
             //TODO:: DElete me
 
             SetTargetFPS(static::TARGET_FPS);
@@ -138,6 +132,44 @@ class Game
             $this->gameTextures->unload();
 
         CloseWindow();
+    }
+
+    protected function createMockEntities()
+    {
+        $workersCreated = $this->createMockWorkers(2);
+
+        $cowEntity = $this->entitiesFactory->createEntityOfType(Cow::class, $this->gameState);
+        $cowEntity->getMoveOptions()
+            ->setTexture($this->gameTextures->getEntityTexture($cowEntity));
+        $this->digestor->addEntity($cowEntity);
+
+        $smallHouseEntity = $this->entitiesFactory->createEntityOfType(SmallHouse::class, $this->gameState);
+        $smallHouseEntity->getMoveOptions()
+            ->setTexture($this->gameTextures->getEntityTexture($smallHouseEntity));
+        $this->digestor->addEntity($smallHouseEntity);
+
+        //Workplaces
+        $mineWorkplace = $this->workplacesFactory->createWorkplaceOfType(Mine::class, $this->gameState);
+        foreach ($workersCreated as $worker) {
+            $this->digestor->addEntityToWorkplace($worker, $mineWorkplace);
+        }
+        $this->digestor->addWorkplace($mineWorkplace);
+    }
+
+    protected function createMockWorkers(int $workersCount): array
+    {
+        $workersCreated = [];
+
+        for ($i = 1; $i <= $workersCount; $i++) {
+            $workerEntity = $this->entitiesFactory->createEntityOfType(HumanWorker::class, $this->gameState);
+            $workerEntity->getMoveOptions()
+                ->setTexture($this->gameTextures->getEntityTexture($workerEntity));
+            $workerEntity->getInventory()->addItem(new Coat());
+            $workersCreated[] = $workerEntity;
+            $this->digestor->addEntity($workerEntity);
+        }
+
+        return $workersCreated;
     }
 
     protected function initSounds()
@@ -394,6 +426,7 @@ class Game
 
         if ($this->gameState->getDaysFromTicks() > $currentPeriod->getDurationInDays()) {
             $this->digestor->digestEntities();
+            $this->digestor->digestWorkplaces();
             $this->digestor->getTimesOfYear()->moveToNextPeriod();
             $this->gameState->setTicks(1);
         }
@@ -474,6 +507,24 @@ class Game
                 $food
             ),
             600 + $foodPositionX + 10,
+            $headerPositionY,
+            $headerFontSize,
+            Color::GREEN()
+        );
+
+        $resourcesPositionX = MeasureText(sprintf(
+            'Food: %d',
+            $food
+        ), 20);
+
+        $resources = $this->gameState->getCurrentResourcesGathered();
+
+        DrawText(
+            sprintf(
+                'Resources: %d',
+                $resources
+            ),
+            600 + $foodPositionX + $resourcesPositionX + 20,
             $headerPositionY,
             $headerFontSize,
             Color::GREEN()

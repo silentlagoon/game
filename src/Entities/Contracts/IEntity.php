@@ -49,4 +49,5 @@ interface IEntity
     public function digestTasks();
     public function getInventory(): Inventory;
     public function setInventory(Inventory $inventory);
+    public function getResourceGatheredPerPeriod(): int;
 }

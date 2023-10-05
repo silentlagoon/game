@@ -31,6 +31,7 @@ abstract class BaseEntity implements IEntity
 
     protected int $entityCost = 0;
     protected int $goldIncomePerPeriod = 0;
+    protected int $resourceGatheredPerPeriod = 0;
 
     protected bool $canProduceNaturalResources = false;
     protected array $produceNaturalResourcesCollection = [];
@@ -494,5 +495,13 @@ abstract class BaseEntity implements IEntity
     public function setInventory(Inventory $inventory)
     {
         $this->inventory = $inventory;
+    }
+
+    /**
+     * @return int
+     */
+    public function getResourceGatheredPerPeriod(): int
+    {
+        return $this->resourceGatheredPerPeriod;
     }
 }

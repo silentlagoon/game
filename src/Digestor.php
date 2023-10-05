@@ -9,6 +9,8 @@ use App\Entities\Living\Animals\Cow;
 use App\Entities\Structures\SmallHouse;
 use App\Periods\TimesOfYear;
 use App\State\GameState;
+use App\Workplaces\Contracts\IWorkplace;
+use http\Exception\RuntimeException;
 
 class Digestor
 {
@@ -19,20 +21,22 @@ class Digestor
     protected GameState $gameState;
     /** @var $entitiesSelected IEntity[] */
     protected array $entitiesSelected;
+    /** @var $workplaces IWorkplace[]  */
+    protected array $workplaces;
 
     public function __construct(
         GameState $gameState,
         array $entities,
         array$entitiesSelected,
         TimesOfYear $timesOfYear,
-        int $currentYear
+        array $workplaces
     )
     {
         $this->gameState = $gameState;
         $this->entities = $entities;
         $this->entitiesSelected = $entitiesSelected;
         $this->timesOfYear = $timesOfYear;
-        $this->currentYear = $currentYear;
+        $this->workplaces = $workplaces;
     }
 
     public function digestEntities()
@@ -47,8 +51,17 @@ class Digestor
                 $this->removeEntityFromDigest($entity, $key);
             }
         }
+    }
 
-        $this->currentYear++;
+    public function digestWorkplaces()
+    {
+        foreach ($this->workplaces as $workplace) {
+            $workplace->digestPeriod($this->timesOfYear->getCurrentPeriod());
+
+            if ($workplace->isEmpty()) {
+                $this->removeEntitiesFromWorkplace($workplace);
+            }
+        }
     }
 
     public function digestEntitiesTasks()
@@ -88,6 +101,11 @@ class Digestor
         }
     }
 
+    public function addWorkplace(IWorkplace $workplace)
+    {
+        $this->workplaces[] = $workplace;
+    }
+
     public function getTimesOfYear(): TimesOfYear
     {
         return $this->timesOfYear;
@@ -122,11 +140,38 @@ class Digestor
         }
 
         $entity->setDateOfDeath(new GameDate(
-            $this->currentYear,
+            $this->getTimesOfYear()->getCurrentYear(),
             $this->timesOfYear->getCurrentPeriod(),
             $this->gameState->getDaysFromTicks()
         ));
 
         unset($this->entities[$key]);
+    }
+
+    public function addEntityToWorkplace(IEntity $worker, IWorkplace $workplace): void
+    {
+        $result = null;
+
+        foreach ($this->entities as $key => $entity) {
+            if ($entity->getName() === $worker->getName()) {
+                $result = $entity;
+                unset($this->entities[$key]);
+            }
+        }
+
+        if (is_null($result)) {
+            throw new RuntimeException('Could not find worker at digestor entities array');
+        }
+
+        $workplace->addWorker($result);
+    }
+
+    protected function removeEntitiesFromWorkplace(IWorkplace $workplace): void
+    {
+        foreach ($workplace->getWorkers() as $entity) {
+            $this->addEntity($entity);
+        }
+
+        $workplace->removeWorkers();
     }
 }

@@ -10,6 +10,7 @@ class Worker extends BaseLivingEntity implements IPopulation
     protected int $maxHitPoints = 100;
     protected int $currentHitPoints = 100;
     protected int $goldIncomePerPeriod = 1;
+    protected int $resourceGatheredPerPeriod = 10000;
     protected int $entityCost = 10;
 
     protected bool $shouldConsumeFood = true;
