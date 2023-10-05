@@ -10,14 +10,12 @@ use App\Entities\Structures\SmallHouse;
 use App\Periods\TimesOfYear;
 use App\State\GameState;
 use App\Workplaces\Contracts\IWorkplace;
-use http\Exception\RuntimeException;
 
 class Digestor
 {
     /** @var $entities IEntity[] */
     protected array $entities;
     protected TimesOfYear $timesOfYear;
-    protected int $currentYear;
     protected GameState $gameState;
     /** @var $entitiesSelected IEntity[] */
     protected array $entitiesSelected;
