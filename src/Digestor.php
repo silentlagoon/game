@@ -10,38 +10,31 @@ use App\Entities\Structures\SmallHouse;
 use App\Periods\TimesOfYear;
 use App\State\GameState;
 use App\Workplaces\Contracts\IWorkplace;
+use Illuminate\Support\Collection;
+use RuntimeException;
 
 class Digestor
 {
-    /** @var $entities IEntity[] */
-    protected array $entities;
+    protected Collection $entities;
+    protected Collection $workplaces;
     protected TimesOfYear $timesOfYear;
     protected GameState $gameState;
-    /** @var $entitiesSelected IEntity[] */
-    protected array $entitiesSelected;
-    /** @var $workplaces IWorkplace[]  */
-    protected array $workplaces;
 
     public function __construct(
         GameState $gameState,
-        array $entities,
-        array$entitiesSelected,
-        TimesOfYear $timesOfYear,
-        array $workplaces
+        Collection $entities,
+        Collection $workplaces,
+        TimesOfYear $timesOfYear
     )
     {
         $this->gameState = $gameState;
         $this->entities = $entities;
-        $this->entitiesSelected = $entitiesSelected;
-        $this->timesOfYear = $timesOfYear;
         $this->workplaces = $workplaces;
+        $this->timesOfYear = $timesOfYear;
     }
 
     public function digestEntities()
     {
-        //Make it more random
-        shuffle($this->entities);
-
         foreach ($this->entities as $key => $entity) {
             $entity->digestPeriod($this->timesOfYear->getCurrentPeriod(), $this->gameState);
 
@@ -53,6 +46,7 @@ class Digestor
 
     public function digestWorkplaces()
     {
+        /** @var IWorkplace $workplace */
         foreach ($this->workplaces as $workplace) {
             $workplace->digestPeriod($this->timesOfYear->getCurrentPeriod());
 
@@ -71,37 +65,12 @@ class Digestor
 
     public function getPopulation(): int
     {
-        $population = array_filter($this->entities, function (IEntity $entity) {
-            return $entity instanceof IPopulation;
-        });
-
-        return count($population);
-    }
-
-    public function addEntity(IEntity $entity): void
-    {
-        $this->entities[] = $entity;
-
-        if ($entity instanceof Worker) {
-            $this->gameState->incrementTotalWorkersOwned();
-        }
-
-        if ($entity instanceof  Cow) {
-            $this->gameState->incrementTotalCowsOwned();
-        }
-
-        if ($entity instanceof SmallHouse) {
-            $this->gameState->incrementTotalHousesOwned();
-        }
-
-        if ($entity instanceof IPopulation) {
-            $this->gameState->incrementPopulation();
-        }
+        return $this->gameState->getPopulation();
     }
 
     public function addWorkplace(IWorkplace $workplace)
     {
-        $this->workplaces[] = $workplace;
+        $this->workplaces->push($workplace);
     }
 
     public function getTimesOfYear(): TimesOfYear
@@ -109,21 +78,41 @@ class Digestor
         return $this->timesOfYear;
     }
 
-    public function getEntities(): array
+    public function getEntities(): Collection
     {
         return $this->entities;
     }
 
-    public function getUniqueEntities(): array
+    public function getUniqueEntitiesNames(): Collection
     {
-        return array_unique($this->getEntities());
+        return $this->entities->map(function (IEntity $entity) {
+           return (new \ReflectionClass($entity))->getName();
+        })->unique();
     }
 
-    public function getEntitiesOfType(IEntity $entityType): array
+    public function getEntitiesOfType(string $entityType): Collection
     {
-        return array_values(array_filter($this->entities, function (IEntity $entity) use ($entityType) {
+        return $this->entities->filter(function (IEntity $entity) use ($entityType){
             return $entity instanceof $entityType;
-        }));
+        })->values();
+    }
+
+    public function addEntity(IEntity $entity): void
+    {
+        $this->entities->push($entity);
+
+        if ($entity instanceof Worker) {
+            $this->gameState->incrementTotalWorkersOwned();
+            $this->gameState->incrementPopulation();
+        }
+
+        if ($entity instanceof Cow) {
+            $this->gameState->incrementTotalCowsOwned();
+        }
+
+        if ($entity instanceof SmallHouse) {
+            $this->gameState->incrementTotalHousesOwned();
+        }
     }
 
     protected function removeEntityFromDigest(IEntity $entity, int $key): void
@@ -137,39 +126,36 @@ class Digestor
             $this->gameState->decrementTotalCowsOwned();
         }
 
+        if ($entity instanceof SmallHouse) {
+            $this->gameState->incrementTotalHousesOwned(-1);
+        }
+
+        if ($entity instanceof IPopulation) {
+            $this->gameState->incrementPopulation(-1);
+        }
+
         $entity->setDateOfDeath(new GameDate(
             $this->getTimesOfYear()->getCurrentYear(),
             $this->timesOfYear->getCurrentPeriod(),
             $this->gameState->getDaysFromTicks()
         ));
 
-        unset($this->entities[$key]);
+        $this->entities->forget($key);
     }
 
     public function addEntityToWorkplace(IEntity $worker, IWorkplace $workplace): void
     {
-        $result = null;
-
         foreach ($this->entities as $key => $entity) {
             if ($entity->getName() === $worker->getName()) {
-                $result = $entity;
-                unset($this->entities[$key]);
+                $workplace->addWorker($entity);
+                $this->entities->forget($key);
             }
         }
-
-        if (is_null($result)) {
-            throw new RuntimeException('Could not find worker at digestor entities array');
-        }
-
-        $workplace->addWorker($result);
     }
 
     protected function removeEntitiesFromWorkplace(IWorkplace $workplace): void
     {
-        foreach ($workplace->getWorkers() as $entity) {
-            $this->addEntity($entity);
-        }
-
+        $this->entities = $this->entities->merge($workplace->getWorkers());
         $workplace->removeWorkers();
     }
 }

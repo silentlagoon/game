@@ -122,7 +122,7 @@ class Game
 
             while (!WindowShouldClose()) {
 
-                UpdateMusicStream($this->gameState->getGameStateSounds()->getObject(Sounds::INTRO()->getValue()));
+                //UpdateMusicStream($this->gameState->getGameStateSounds()->getObject(Sounds::INTRO()->getValue()));
 
                 $this->startUpdatePhase();
 
@@ -136,7 +136,7 @@ class Game
 
     protected function createMockEntities()
     {
-        $workersCreated = $this->createMockWorkers(2);
+        $initialWorkersForWorkplace = $this->createMockWorkers(2);
 
         $cowEntity = $this->entitiesFactory->createEntityOfType(Cow::class, $this->gameState);
         $cowEntity->getMoveOptions()
@@ -150,10 +150,14 @@ class Game
 
         //Workplaces
         $mineWorkplace = $this->workplacesFactory->createWorkplaceOfType(Mine::class, $this->gameState);
-        foreach ($workersCreated as $worker) {
+        $this->digestor->addWorkplace($mineWorkplace);
+
+        foreach ($initialWorkersForWorkplace as $worker) {
             $this->digestor->addEntityToWorkplace($worker, $mineWorkplace);
         }
-        $this->digestor->addWorkplace($mineWorkplace);
+
+        $this->gameState->addGoldAmount(10000);
+        $this->createMockWorkers(2);
     }
 
     protected function createMockWorkers(int $workersCount): array
@@ -605,13 +609,13 @@ class Game
 
     protected function drawEntities(&$initialWorkersPositionY)
     {
-        foreach ($this->digestor->getUniqueEntities() as $uniqueEntity) {
+        foreach ($this->digestor->getUniqueEntitiesNames() as $uniqueEntity) {
             $entitiesCollection = $this->digestor->getEntitiesOfType($uniqueEntity);
 
             DrawText(
                 sprintf('%s: %d',
                     (new \ReflectionClass($uniqueEntity))->getShortName(),
-                    count($entitiesCollection)
+                    $entitiesCollection->count()
                 ),
                 5,
                 $initialWorkersPositionY,

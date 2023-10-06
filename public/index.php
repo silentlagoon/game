@@ -9,6 +9,7 @@ use App\State\GameStateNaturalResources;
 use App\State\GameStateObjects;
 use App\State\GameStateSounds;
 use App\Workplaces\WorkplacesFactory;
+use Illuminate\Support\Collection;
 
 require __DIR__.'/../vendor/autoload.php';
 
@@ -24,7 +25,7 @@ $gameState->setUserName($userName)
     ->setSettlementName($settlementName)
     ->addStartingGoldAmount();
 
-$digestor = new Digestor($gameState, [], [], new TimesOfYear(), []);
+$digestor = new Digestor($gameState, new Collection(), new Collection(), new TimesOfYear(), []);
 
 $game = new Game($gameState, $digestor, new EntitiesFactory(), new WorkplacesFactory());
 $game->start();
