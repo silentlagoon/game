@@ -45,6 +45,8 @@ abstract class BaseEntity implements IEntity
     protected float $initialPositionY = Game::SCREEN_HEIGHT / 2;
     protected float $entitySpeed = 0.0;
 
+    protected bool $isWorking = false;
+
     protected EntityMoveOptions $entityMoveOptions;
     protected EntityHitPointsOptions $entityHitPointsOptions;
 
@@ -242,7 +244,7 @@ abstract class BaseEntity implements IEntity
         //Change movement direction if we hit borders
         if (
             ($moveOptions->getPosition()->x >= (GetScreenWidth() - $moveOptions->getTexture()->width)) ||
-            ($moveOptions->getPosition()->y <= $moveOptions->getTexture()->height)
+            ($moveOptions->getPosition()->x <= $moveOptions->getTexture()->width)
         ) {
             $entitySpeedX = $moveOptions->getSpeed()->x *= -1.0;
             $entitySpeedY = $moveOptions->getSpeed()->y;
@@ -252,7 +254,7 @@ abstract class BaseEntity implements IEntity
 
         if (
             ($moveOptions->getPosition()->y >= (GetScreenHeight() - $moveOptions->getTexture()->height)) ||
-            ($moveOptions->getPosition()->x <= $moveOptions->getTexture()->width)
+            ($moveOptions->getPosition()->y <= $moveOptions->getTexture()->height)
         ) {
             $entitySpeedX = $moveOptions->getSpeed()->x;
             $entitySpeedY = $moveOptions->getSpeed()->y *= -1.0;
@@ -377,6 +379,16 @@ abstract class BaseEntity implements IEntity
     public function isDead(): bool
     {
         return $this->currentHitPoints === 0;
+    }
+
+    public function isWorking(): bool
+    {
+        return $this->isWorking;
+    }
+
+    public function setIsWorking(bool $value): void
+    {
+        $this->isWorking = $value;
     }
 
     public function getName(): string

@@ -5,6 +5,7 @@ namespace App\Entities;
 use App\Entities\Contracts\IEntity;
 use App\Entities\Living\Humans\Worker;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+use App\Game;
 use App\Inventory\Inventory;
 use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;
@@ -34,8 +35,9 @@ class EntitiesFactory
         /** @var IEntity $entity */
         $entity = new $entity($gameState);
 
+        $entityInitialPositionX = rand(10, Game::SCREEN_WIDTH - 10);
         $entity->setEntityMoveOptions(new EntityMoveOptions(
-            new Vector2($entity->getInitialPositionX(), $entity->getInitialPositionY()),
+            new Vector2($entityInitialPositionX, $entity->getInitialPositionY()),
             new Vector2($entity->getEntitySpeed(), $entity->getEntitySpeed())
         ));
 
@@ -45,7 +47,7 @@ class EntitiesFactory
 
         $entity->setEntityHitPointsOptions(new EntityHitPointsOptions(
             new Rectangle(
-                $entity->getInitialPositionX() + 5,
+                $entityInitialPositionX + 5,
                 $entity->getInitialPositionY() - 7,
                 15,
                 5

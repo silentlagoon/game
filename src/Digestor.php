@@ -11,7 +11,6 @@ use App\Periods\TimesOfYear;
 use App\State\GameState;
 use App\Workplaces\Contracts\IWorkplace;
 use Illuminate\Support\Collection;
-use RuntimeException;
 
 class Digestor
 {
@@ -92,9 +91,22 @@ class Digestor
 
     public function getEntitiesOfType(string $entityType): Collection
     {
-        return $this->entities->filter(function (IEntity $entity) use ($entityType){
+        $workplaceWorkers = new Collection();
+
+        if ($entityType === Worker::class) {
+            /** @var IWorkplace $workplace */
+            foreach ($this->workplaces as $workplace) {
+                if ($anyWorkers = $workplace->getWorkers()) {
+                    $workplaceWorkers = $workplaceWorkers->merge($anyWorkers);
+                }
+            }
+        }
+
+        $entities = $this->entities->filter(function (IEntity $entity) use ($entityType) {
             return $entity instanceof $entityType;
         })->values();
+
+        return $entities->merge($workplaceWorkers);
     }
 
     public function addEntity(IEntity $entity): void
@@ -112,6 +124,18 @@ class Digestor
 
         if ($entity instanceof SmallHouse) {
             $this->gameState->incrementTotalHousesOwned();
+        }
+    }
+
+    public function addEntityToWorkplace(IEntity $worker, IWorkplace $workplace): void
+    {
+        /** @var IEntity $entity */
+        foreach ($this->entities as $key => $entity) {
+            if ($entity->getName() === $worker->getName()) {
+                $entity->setIsWorking(true);
+                $workplace->addWorker($entity);
+                $this->entities->forget($key);
+            }
         }
     }
 
@@ -143,19 +167,14 @@ class Digestor
         $this->entities->forget($key);
     }
 
-    public function addEntityToWorkplace(IEntity $worker, IWorkplace $workplace): void
-    {
-        foreach ($this->entities as $key => $entity) {
-            if ($entity->getName() === $worker->getName()) {
-                $workplace->addWorker($entity);
-                $this->entities->forget($key);
-            }
-        }
-    }
-
     protected function removeEntitiesFromWorkplace(IWorkplace $workplace): void
     {
-        $this->entities = $this->entities->merge($workplace->getWorkers());
+        /** @var IEntity $worker */
+        foreach ($workplace->getWorkers() as $worker) {
+            $worker->setIsWorking(false);
+            $this->entities->push($worker);
+        }
+
         $workplace->removeWorkers();
     }
 }

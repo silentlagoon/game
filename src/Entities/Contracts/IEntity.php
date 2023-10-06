@@ -50,4 +50,6 @@ interface IEntity
     public function getInventory(): Inventory;
     public function setInventory(Inventory $inventory);
     public function getResourceGatheredPerPeriod(): int;
+    public function isWorking(): bool;
+    public function setIsWorking(bool $value): void;
 }

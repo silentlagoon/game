@@ -634,7 +634,7 @@ class Game
 
     protected function drawEntity(IEntity $entity, &$initialWorkersPositionY)
     {
-        if (!$entity->isDead()) {
+        if (!$entity->isDead() || !$entity->isWorking()) {
             if ($entity->getCurrentHitPointsPercent() > 50) {
                 DrawTexture(
                     $this->gameTextures->getEntityTexture($entity),
