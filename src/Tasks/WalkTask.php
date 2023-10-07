@@ -28,64 +28,54 @@ class WalkTask implements ITask
             return;
         }
 
-        $entityPositionX = $moveOptions->getPosition()->x;
+        //We don`t know if initial speed positive or negative
+        //So we take absolute speed
+        $entitySpeedX = abs($moveOptions->getSpeed()->x);
+        $entitySpeedY = abs($moveOptions->getSpeed()->y);
 
-        if($moveOptions->getPosition()->x > $this->getDirection()->x) {
-
-            $resultSpeedX = $moveOptions->getSpeed()->x;
-            $measureDistanceToPoint = $moveOptions->getPosition()->x - $this->getDirection()->x;
-
-            if ($measureDistanceToPoint < $moveOptions->getSpeed()->x) {
-                $entityPositionX = $this->getDirection()->x;
-            } else {
-                $entityPositionX = $moveOptions->getPosition()->x - $resultSpeedX;
-            }
-        } else if ($moveOptions->getPosition()->x < $this->getDirection()->x) {
-
-            $resultSpeedX = $moveOptions->getSpeed()->x;
-            $measureDistanceToPoint = $this->getDirection()->x - $moveOptions->getPosition()->x;
-
-            if ($measureDistanceToPoint < $moveOptions->getSpeed()->x) {
-                $entityPositionX = $this->getDirection()->x;
-            } else {
-                $entityPositionX = $moveOptions->getPosition()->x + $resultSpeedX;
-            }
+        if ($moveOptions->getPosition()->x > $this->getDirection()->x) {
+            $entitySpeedX *= -1;
         }
-
-        $entityPositionY = $moveOptions->getPosition()->y;
 
         if ($moveOptions->getPosition()->y > $this->getDirection()->y) {
-
-            $resultSpeedY = $moveOptions->getSpeed()->y;
-            $measureDistanceToPoint = $moveOptions->getPosition()->y - $this->getDirection()->y;
-
-            if ($measureDistanceToPoint < $moveOptions->getSpeed()->y) {
-                $entityPositionY = $this->getDirection()->y;
-            } else {
-                $entityPositionY = $moveOptions->getPosition()->y - $resultSpeedY;
-            }
-        } elseif ($moveOptions->getPosition()->y < $this->getDirection()->y) {
-
-            $resultSpeedY = $moveOptions->getSpeed()->y;
-            $measureDistanceToPoint = $this->getDirection()->y - $moveOptions->getPosition()->y;
-
-            if ($measureDistanceToPoint < $moveOptions->getSpeed()->y) {
-                $entityPositionY = $this->getDirection()->y;
-            } else {
-                $entityPositionY = $moveOptions->getPosition()->y + $resultSpeedY;
-            }
+            $entitySpeedY *= -1;
         }
 
-        $moveOptions->setPosition(new Vector2($entityPositionX, $entityPositionY));
+        if ($moveOptions->getPosition()->x === $this->getDirection()->x) {
+            $entitySpeedX = 0;
+        }
+
+        if ($moveOptions->getPosition()->y === $this->getDirection()->y) {
+            $entitySpeedY = 0;
+        }
+
+        $newVectorPositionX = $moveOptions->getPosition()->x + $entitySpeedX;
+        $newVectorPositionY = $moveOptions->getPosition()->y + $entitySpeedY;
+
+        $predictX = abs($newVectorPositionX - $this->getDirection()->x);
+        $predictY = abs($newVectorPositionY - $this->getDirection()->y);
+
+        if ($predictX < $moveOptions->getSpeed()->x) {
+            $newVectorPositionX = $this->getDirection()->x;
+        }
+
+        if ($predictY < $moveOptions->getSpeed()->y) {
+            $newVectorPositionY = $this->getDirection()->y;
+        }
+
+        $moveOptions->getPosition()->x = $newVectorPositionX;
+        $moveOptions->getPosition()->y = $newVectorPositionY;
 
         $hitPointsBar = $hitPointsOptions->getBar();
+        $hitPointsBar->x = $newVectorPositionX + 5;
+        $hitPointsBar->y = $newVectorPositionY - 7;
 
-        $hitPointsOptions->setBar(new Rectangle(
-            $entityPositionX + 5,
-            $entityPositionY - 7,
-            $hitPointsBar->width,
-            $hitPointsBar->height
-        ));
+//        $hitPointsOptions->setBar(new Rectangle(
+//            $moveOptions->getPosition()->x + 5,
+//            $moveOptions->getPosition()->y - 7,
+//            $hitPointsBar->width,
+//            $hitPointsBar->height
+//        ));
     }
 
     /**

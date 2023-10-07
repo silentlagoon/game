@@ -206,6 +206,7 @@ class Game
 
             $this->fireMainMenuAction();
 
+            /** @var IEntity $entity */
             foreach ($this->digestor->getEntities() as $entity) {
                 $entityPosition = $entity->getMoveOptions()->getPosition();
                 $texture = $this->gameTextures->getEntityTexture($entity);
