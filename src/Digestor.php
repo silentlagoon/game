@@ -27,7 +27,7 @@ class Digestor
     public function digestEntities()
     {
         foreach ($this->entities as $key => $entity) {
-            $entity->digestPeriod($this->timesOfYear->getCurrentPeriod(), $this->gameState);
+            $entity-> digestPeriod($this->timesOfYear->getCurrentPeriod(), $this->gameState);
 
             if ($entity->isDead()) {
                 $this->removeEntityFromDigest($entity, $key);

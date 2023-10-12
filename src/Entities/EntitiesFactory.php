@@ -5,6 +5,11 @@ namespace App\Entities;
 use App\Entities\Contracts\IEntity;
 use App\Entities\Living\Humans\Worker;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+<<<<<<< Updated upstream
+=======
+use App\Inventory\Equipment;
+use App\Inventory\Inventory;
+>>>>>>> Stashed changes
 use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;
 use App\State\GameState;
@@ -62,6 +67,14 @@ class EntitiesFactory
             $entity->setName($namesGenerator->getName());
         }
 
+<<<<<<< Updated upstream
+=======
+        $entity->setTaskQueue(new TaskQueue());
+
+        $entity->setInventory(new Inventory());
+        $entity->setEquipment(new Equipment());
+
+>>>>>>> Stashed changes
         return $entity;
     }
 

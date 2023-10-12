@@ -3,6 +3,11 @@
 namespace App\Entities\Contracts;
 
 use App\GameDate;
+<<<<<<< Updated upstream
+=======
+use App\Inventory\Equipment;
+use App\Inventory\Inventory;
+>>>>>>> Stashed changes
 use App\Periods\Contracts\IPeriod;
 use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;
@@ -14,7 +19,7 @@ interface IEntity
     public function setDateOfDeath(GameDate $date);
     public function getDateOfDeath(): ?GameDate;
     public function getCurrentHitPoints(): int;
-    public function setCurrentHitPoints(int $hitPoints): void;
+    public function setCurrgitentHitPoints(int $hitPoints): void;
     public function receiveDamage(int $hitPoints): int;
     public function regenerateDamage(int $hitPoints): int;
     public function getCurrentHitPointsPercent(): int;
@@ -37,4 +42,20 @@ interface IEntity
     public function setEntityMoveOptions(EntityMoveOptions $entityMoveOptions);
     public function getEntityHitPointsOptions(): EntityHitPointsOptions;
     public function setEntityHitPointsOptions(EntityHitPointsOptions $entityHitPointsOptions): void;
+<<<<<<< Updated upstream
+=======
+    public function move(): void;
+    public function setTask(?ITask $task);
+    public function getTask(): ?ITask;
+    public function isSelected(): bool;
+    public function setSelected(bool $value): void;
+    public function getTaskQueue(): TaskQueue;
+    public function setTaskQueue(TaskQueue $taskQueue);
+    public function digestTasks();
+    public function getInventory(): Inventory;
+    public function setInventory(Inventory $inventory);
+    public function getEquipment(): Equipment;
+    public function setEquipment(Equipment $equipment): void;
+    public function getResourceGatheredPerPeriod(): int;
+>>>>>>> Stashed changes
 }

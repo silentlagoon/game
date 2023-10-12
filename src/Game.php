@@ -9,7 +9,12 @@ use App\Entities\Living\Animals\Cow;
 use App\Entities\Living\Humans\Worker;
 use App\Enums\Sounds;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+<<<<<<< Updated upstream
 use App\Position\EntityMoveOptions;
+=======
+use App\Inventory\Items\Coat;
+use App\Inventory\Items\Hammer;
+>>>>>>> Stashed changes
 use App\State\GameState;
 use App\State\ObjectActions\HitPointsAction;
 use App\State\ObjectActions\MainMenuAction;
@@ -116,6 +121,56 @@ class Game
         CloseWindow();
     }
 
+<<<<<<< Updated upstream
+=======
+    protected function createMockEntities()
+    {
+        $workersCreated = $this->createMockWorkers(1);
+
+        $workerEntity = $this->entitiesFactory->createEntityOfType(HumanWorker::class, $this->gameState);
+        $workerEntity->getMoveOptions()
+            ->setTexture($this->gameTextures->getEntityTexture($workerEntity));
+        $workerEntity->getInventory()->addItem(new Coat());
+        $workerEntity->getEquipment()->addItem(new Hammer());
+
+       // var_dump($workerEntity->getEquipment());
+        $this->digestor->addEntity($workerEntity);
+
+        $cowEntity = $this->entitiesFactory->createEntityOfType(Cow::class, $this->gameState);
+        $cowEntity->getMoveOptions()
+            ->setTexture($this->gameTextures->getEntityTexture($cowEntity));
+        $this->digestor->addEntity($cowEntity);
+
+        $smallHouseEntity = $this->entitiesFactory->createEntityOfType(SmallHouse::class, $this->gameState);
+        $smallHouseEntity->getMoveOptions()
+            ->setTexture($this->gameTextures->getEntityTexture($smallHouseEntity));
+        $this->digestor->addEntity($smallHouseEntity);
+
+        //Workplaces
+        $mineWorkplace = $this->workplacesFactory->createWorkplaceOfType(Mine::class, $this->gameState);
+        foreach ($workersCreated as $worker) {
+            $this->digestor->addEntityToWorkplace($worker, $mineWorkplace);
+        }
+        $this->digestor->addWorkplace($mineWorkplace);
+    }
+
+    protected function createMockWorkers(int $workersCount): array
+    {
+        $workersCreated = [];
+
+        for ($i = 1; $i <= $workersCount; $i++) {
+            $workerEntity = $this->entitiesFactory->createEntityOfType(HumanWorker::class, $this->gameState);
+            $workerEntity->getMoveOptions()
+                ->setTexture($this->gameTextures->getEntityTexture($workerEntity));
+            $workerEntity->getInventory()->addItem(new Coat());
+            $workersCreated[] = $workerEntity;
+            $this->digestor->addEntity($workerEntity);
+        }
+
+        return $workersCreated;
+    }
+
+>>>>>>> Stashed changes
     protected function initSounds()
     {
         InitAudioDevice();

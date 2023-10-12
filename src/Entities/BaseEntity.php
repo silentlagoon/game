@@ -6,6 +6,13 @@ use App\Game;
 use App\GameDate;
 use App\Entities\Contracts\IEntity;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+<<<<<<< Updated upstream
+=======
+use App\Inventory\Inventory;
+use App\Inventory\Equipment;
+use App\Inventory\Items\Coat;
+use App\Inventory\Items\Contracts\IGiveGoldIncome;
+>>>>>>> Stashed changes
 use App\NaturalResources\Contracts\INaturalResource;
 use App\Periods\Contracts\IPeriod;
 use App\Position\EntityHitPointsOptions;
@@ -47,6 +54,17 @@ abstract class BaseEntity implements IEntity
     protected GameDate $dateOfDeath;
     protected GameState $gameState;
 
+<<<<<<< Updated upstream
+=======
+    protected ?ITask $task = null;
+    protected TaskQueue $taskQueue;
+    protected bool $isSelected = false;
+
+    protected Inventory $inventory;
+    protected Equipment $equipment;
+
+
+>>>>>>> Stashed changes
     /**
      * @param GameState $gameState
      * @param bool $isFreeOfCost
@@ -292,7 +310,35 @@ abstract class BaseEntity implements IEntity
 
     public function getGoldIncomePerPeriod(): int
     {
-        return $this->isDead() ? 0 : $this->goldIncomePerPeriod;
+
+        if ($this->isDead()) {
+            return 0;
+        }
+
+        $equipmentItems = $this->getEquipment()->all();
+        return $this->goldIncomePerPeriod + $this->getEquipmentTotal($equipmentItems);
+    }
+
+    protected function getEquipmentTotal(array $items): int
+    {
+        $equipmentIncome = 0;
+        foreach ($items as $item) {
+            $equipmentIncome = $equipmentIncome +  $this->getEquipmentSum($item);
+        }
+        return $equipmentIncome;
+    }
+
+    protected function getEquipmentSum(array $equipments): int
+    {
+        $sum = 0;
+        foreach ($equipments as $equipment) {
+
+            if ($equipment instanceof IGiveGoldIncome) {
+                $modifier = $equipment->getIncomeModifier();
+                $sum = $sum + $modifier;
+            }
+        }
+        return $sum;
     }
 
     /**
@@ -399,3 +445,30 @@ abstract class BaseEntity implements IEntity
 
 
 
+<<<<<<< Updated upstream
+=======
+    /**
+     * @return int
+     */
+    public function getResourceGatheredPerPeriod(): int
+    {
+        return $this->resourceGatheredPerPeriod;
+    }
+
+    public function getEquipment(): Equipment
+    {
+        return $this->equipment;
+    }
+
+    public function setEquipment(Equipment $equipment): void
+    {
+        $this->equipment = $equipment;
+    }
+
+    public function calculateWeight()
+    {
+
+    }
+
+}
+>>>>>>> Stashed changes
