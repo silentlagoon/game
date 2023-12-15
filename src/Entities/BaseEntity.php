@@ -2,16 +2,23 @@
 
 namespace App\Entities;
 
-use App\Game;
-use App\GameDate;
 use App\Entities\Contracts\IEntity;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 =======
 use App\Inventory\Inventory;
 use App\Inventory\Equipment;
 use App\Inventory\Items\Coat;
 use App\Inventory\Items\Contracts\IGiveGoldIncome;
+>>>>>>> Stashed changes
+=======
+use App\Game;
+use App\GameDate;
+use App\Inventory\Equipment;
+use App\Inventory\Inventory;
+use App\Inventory\Items\Contracts\IGiveGoldIncome;
+use App\Inventory\Items\Contracts\IInventoryItem;
 >>>>>>> Stashed changes
 use App\NaturalResources\Contracts\INaturalResource;
 use App\Periods\Contracts\IPeriod;
@@ -62,6 +69,10 @@ abstract class BaseEntity implements IEntity
 
     protected Inventory $inventory;
     protected Equipment $equipment;
+<<<<<<< Updated upstream
+=======
+    protected int $weightCapacity;
+>>>>>>> Stashed changes
 
 
 >>>>>>> Stashed changes
@@ -321,6 +332,7 @@ abstract class BaseEntity implements IEntity
 
     protected function getEquipmentTotal(array $items): int
     {
+<<<<<<< Updated upstream
         $equipmentIncome = 0;
         foreach ($items as $item) {
             $equipmentIncome = $equipmentIncome +  $this->getEquipmentSum($item);
@@ -337,6 +349,16 @@ abstract class BaseEntity implements IEntity
                 $modifier = $equipment->getIncomeModifier();
                 $sum = $sum + $modifier;
             }
+=======
+        $sum = 0;
+        foreach ($items as $item) {
+
+            if ($item instanceof IGiveGoldIncome) {
+                $modifier = $item->getIncomeModifier();
+                $sum = $sum + $modifier;
+            }
+
+>>>>>>> Stashed changes
         }
         return $sum;
     }
@@ -366,7 +388,6 @@ abstract class BaseEntity implements IEntity
         $resultHitPoints = sprintf('%s / %s', $this->getCurrentHitPoints(), $this->getMaxHitPoints());
         return compact('damageReceived', 'resultHitPoints');
     }
-
     protected function processFoodConsuming()
     {
         $totalFoodValueAvailable = $this->gameState->getGameStateNaturalResources()->getTotalFoodValue();
@@ -405,7 +426,11 @@ abstract class BaseEntity implements IEntity
         $damageHealed = $period->getNatureHealing();
 
         if ($this->canBeDamagedByNature) {
+<<<<<<< Updated upstream
             $this->receiveDamage($period->getNatureDamage());
+=======
+                $this->receiveDamage($period->getNatureDamage());
+>>>>>>> Stashed changes
         }
 
         if ($this->canBeHealedByNature) {
@@ -437,16 +462,32 @@ abstract class BaseEntity implements IEntity
         return $this->canUseEquipment;
     }
 
+<<<<<<< Updated upstream
     public function getEquipmentCollection(): array
+=======
+    public function setInventory(Inventory $inventory): void
+>>>>>>> Stashed changes
     {
         return $this->EquipmentCollection;
     }
   }
 
+<<<<<<< Updated upstream
 
 
 <<<<<<< Updated upstream
 =======
+=======
+    public function getEquipment(): Equipment
+    {
+        return $this->equipment;
+    }
+
+    public function setEquipment(Equipment $equipment): void
+    {
+        $this->equipment = $equipment;
+    }
+>>>>>>> Stashed changes
     /**
      * @return int
      */
@@ -455,6 +496,7 @@ abstract class BaseEntity implements IEntity
         return $this->resourceGatheredPerPeriod;
     }
 
+<<<<<<< Updated upstream
     public function getEquipment(): Equipment
     {
         return $this->equipment;
@@ -468,6 +510,72 @@ abstract class BaseEntity implements IEntity
     public function calculateWeight()
     {
 
+    }
+
+}
+>>>>>>> Stashed changes
+=======
+    public function modifyResourceGatheredPerPeriod(): int
+    {
+        $value = 0;
+        $tools = $this->getEquipment()->all();
+        foreach ($tools as $tool) {
+
+            if ($tool instanceof IGiveGoldIncome && $tool->isBeingUsed()) {
+               $value = $this->resourceGatheredPerPeriod * $tool->getModifier() - $this->resourceGatheredPerPeriod;
+            }
+        }
+        return $value;
+    }
+    public function processWorkWithTool(IPeriod $period): void
+    {
+        $tools = $this->getEquipment()->all();
+        foreach ($tools as $tool) {
+
+            if ($tool instanceof IGiveGoldIncome && $tool->isBeingUsed()) {
+                $tool->processUseDamage($period);
+            }
+
+            if ($tool->isBroken()){
+                $this->getEquipment()->removeItem($tool);
+            }
+        }
+    }
+
+    public function getWeightCapacity(): int
+    {
+        return $this->weightCapacity;
+    }
+
+    public function addEquipment(IInventoryItem $item): void
+    {
+
+        if ( $this->isOverWeight($item)){
+            $this->getEquipment()->addItem($item);
+
+        }
+    }
+
+    public function isOverWeight(IInventoryItem $item): bool
+    {
+
+        if ($this->getCurrentWeightValue() + $item->getWeightValue() <= $this->getWeightCapacity()){
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    public function getCurrentWeightValue(): int
+    {
+        $currentWeight = 0;
+        $items = $this->getEquipment()->all();
+
+        foreach ($items as $item) {
+            $currentWeight = $currentWeight + $this->getEquipment()->getWeightProperty($item);
+        }
+        return $currentWeight;
     }
 
 }

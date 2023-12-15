@@ -5,6 +5,7 @@ namespace App\State;
 use App\Entities\Contracts\IEntity;
 use App\Entities\Living\Humans\Worker;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+use App\Resources\Contracts\IResources;
 
 class GameState
 {
@@ -33,7 +34,11 @@ class GameState
     protected GameStateObjects $gameStateObjects;
     protected GameStateSounds $gameStateSounds;
     protected GameStateNaturalResources $gameStateNaturalResources;
+<<<<<<< Updated upstream
     protected GameStateItems $gameStateItems;
+=======
+    protected GameStateResources $gameStateResources;
+>>>>>>> Stashed changes
 
     /**
      * @param GameStateObjects $gameStateObjects
@@ -336,4 +341,31 @@ class GameState
     {
         return $this->currentGoldAmount >= $entity->getCost();
     }
+<<<<<<< Updated upstream
+=======
+
+    public function getPopulation(): int
+    {
+        return $this->population;
+    }
+
+    public function incrementPopulation($increment = 1)
+    {
+        $this->population += $increment;
+    }
+
+    /**
+     * @return GameStateResources
+     */
+    public function getGameStateResources(): GameStateResources
+    {
+       return $this->gameStateResources;
+    }
+
+    public function setGameStateResources(GameStateResources $gameStateResources): GameState
+    {
+        $this->gameStateResources = $gameStateResources;
+        return $this;
+    }
+>>>>>>> Stashed changes
 }

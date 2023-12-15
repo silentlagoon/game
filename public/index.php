@@ -10,6 +10,7 @@ use App\Periods\TimesOfYear;
 use App\State\GameState;
 use App\State\GameStateNaturalResources;
 use App\State\GameStateObjects;
+use App\State\GameStateResources;
 use App\State\GameStateSounds;
 
 require __DIR__.'/../vendor/autoload.php';
@@ -20,7 +21,8 @@ $settlementName = '';
 $gameState = new GameState();
 $gameState->setGameStateObject(new GameStateObjects())
     ->setGameStateSounds(new GameStateSounds())
-    ->setGameStateNaturalResources(new GameStateNaturalResources());
+    ->setGameStateNaturalResources(new GameStateNaturalResources())
+    ->setGameStateResources(new GameStateResources());
 
 $gameState->setUserName($userName)
     ->setSettlementName($settlementName)

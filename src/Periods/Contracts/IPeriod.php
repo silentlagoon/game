@@ -10,4 +10,5 @@ interface IPeriod
     public function getCollapseDamage(): int;
     public function getName(): string;
     public function getDurationInDays(): int;
+    public function getDurabilityDamage(): int;
 }

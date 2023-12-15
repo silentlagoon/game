@@ -6,6 +6,7 @@ use App\Entities\Contracts\IEntity;
 use App\Entities\EntitiesAllowedToBuy;
 use App\Entities\EntitiesFactory;
 use App\Entities\Living\Animals\Cow;
+<<<<<<< Updated upstream
 use App\Entities\Living\Humans\Worker;
 use App\Enums\Sounds;
 use App\Exceptions\Profile\NotEnoughGoldToSpendException;
@@ -15,10 +16,28 @@ use App\Position\EntityMoveOptions;
 use App\Inventory\Items\Coat;
 use App\Inventory\Items\Hammer;
 >>>>>>> Stashed changes
+=======
+use App\Entities\Living\Humans\Worker as HumanWorker;
+use App\Entities\Structures\SmallHouse;
+use App\Enums\Sounds;
+use App\Exceptions\Profile\NotEnoughGoldToSpendException;
+use App\Inventory\Items\Clothes\Coat;
+use App\Inventory\Items\Tools\Axe;
+use App\Inventory\Items\Tools\Hammer;
+use App\Inventory\Items\Tools\PickAxe;
+>>>>>>> Stashed changes
 use App\State\GameState;
 use App\State\ObjectActions\HitPointsAction;
 use App\State\ObjectActions\MainMenuAction;
 use App\State\ObjectActions\UsernameFormAction;
+<<<<<<< Updated upstream
+=======
+use App\Tasks\MoveTask;
+use App\Tasks\WalkTask;
+use App\Workplaces\Mine;
+use App\Workplaces\SawMill;
+use App\Workplaces\WorkplacesFactory;
+>>>>>>> Stashed changes
 use raylib\Color;
 use raylib\Rectangle;
 use raylib\Vector2;
@@ -125,6 +144,7 @@ class Game
 =======
     protected function createMockEntities()
     {
+<<<<<<< Updated upstream
         $workersCreated = $this->createMockWorkers(1);
 
         $workerEntity = $this->entitiesFactory->createEntityOfType(HumanWorker::class, $this->gameState);
@@ -135,6 +155,17 @@ class Game
 
        // var_dump($workerEntity->getEquipment());
         $this->digestor->addEntity($workerEntity);
+=======
+        $initialWorkersForMine = $this->createMockWorkers(1);
+        $initialWorkersForSawMill = $this->createMockWorkers(1);
+
+//        $workerEntity = $this->entitiesFactory->createEntityOfType(HumanWorker::class, $this->gameState);
+//        $workerEntity->getMoveOptions()
+//            ->setTexture($this->gameTextures->getEntityTexture($workerEntity));
+//        $workerEntity->addEquipment(new PickAxe());
+//        var_dump($workerEntity->getEquipment());
+//        $this->digestor->addEntity($workerEntity);
+>>>>>>> Stashed changes
 
         $cowEntity = $this->entitiesFactory->createEntityOfType(Cow::class, $this->gameState);
         $cowEntity->getMoveOptions()
@@ -148,10 +179,28 @@ class Game
 
         //Workplaces
         $mineWorkplace = $this->workplacesFactory->createWorkplaceOfType(Mine::class, $this->gameState);
+<<<<<<< Updated upstream
         foreach ($workersCreated as $worker) {
             $this->digestor->addEntityToWorkplace($worker, $mineWorkplace);
         }
         $this->digestor->addWorkplace($mineWorkplace);
+=======
+        $this->digestor->addWorkplace($mineWorkplace);
+
+       foreach ($initialWorkersForMine as $worker) {
+           $this->digestor->addEntityToWorkplace($worker, $mineWorkplace);
+       }
+
+       $sawMillWorkplace = $this->workplacesFactory->createWorkplaceOfType(SawMill::class, $this->gameState);
+        $this->digestor->addWorkplace($sawMillWorkplace);
+
+       foreach ($initialWorkersForSawMill as $worker) {
+           $this->digestor->addEntityToWorkplace($worker, $sawMillWorkplace);
+       }
+
+        $this->gameState->addGoldAmount(10000);
+       // $this->createMockWorkers(1);
+>>>>>>> Stashed changes
     }
 
     protected function createMockWorkers(int $workersCount): array
@@ -162,7 +211,13 @@ class Game
             $workerEntity = $this->entitiesFactory->createEntityOfType(HumanWorker::class, $this->gameState);
             $workerEntity->getMoveOptions()
                 ->setTexture($this->gameTextures->getEntityTexture($workerEntity));
-            $workerEntity->getInventory()->addItem(new Coat());
+
+            $workerEntity->addEquipment(new PickAxe());
+            $workerEntity->addEquipment(new Axe());
+            //dump($this->gameState->getGameStateNaturalResources());
+            //$workerEntity->getEquipment()->removeItem();
+           // $workerEntity->getEquipment()->getItemByType('Mining');
+
             $workersCreated[] = $workerEntity;
             $this->digestor->addEntity($workerEntity);
         }
@@ -475,6 +530,32 @@ class Game
             Color::GREEN()
         );
 
+<<<<<<< Updated upstream
+=======
+        $resourcesPositionX = MeasureText(sprintf(
+            'Food: %d',
+            $food
+        ), 20);
+
+        $resources = $this->gameState->getGameStateResources()->getObjects();
+        $resourcesPositionY = $headerPositionY;
+
+        foreach ($resources as $resourceName => $resourceValue) {
+            DrawText(
+                sprintf(
+                    '%s: %d',
+                    $resourceName,
+                    $resourceValue
+                ),
+                600 + $foodPositionX + $resourcesPositionX + 20,
+                $resourcesPositionY,
+                $headerFontSize,
+                Color::GREEN()
+            );
+            $resourcesPositionY += 20;
+        }
+
+>>>>>>> Stashed changes
         return $headerPositionY + $headerFontSize + $headerSpaceAfter;
     }
 

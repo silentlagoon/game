@@ -7,6 +7,11 @@ use App\GameDate;
 =======
 use App\Inventory\Equipment;
 use App\Inventory\Inventory;
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+use App\Inventory\Equipment;
+use App\Inventory\Items\Contracts\IInventoryItem;
 >>>>>>> Stashed changes
 use App\Periods\Contracts\IPeriod;
 use App\Position\EntityHitPointsOptions;
@@ -57,5 +62,13 @@ interface IEntity
     public function getEquipment(): Equipment;
     public function setEquipment(Equipment $equipment): void;
     public function getResourceGatheredPerPeriod(): int;
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+    public function getWeightCapacity(): int;
+    public function addEquipment(IInventoryItem $item): void;
+    public function getCurrentWeightValue(): int;
+    public function processWorkWithTool(IPeriod $period): void;
+    public function modifyResourceGatheredPerPeriod(): int;
 >>>>>>> Stashed changes
 }

@@ -9,6 +9,11 @@ use App\Exceptions\Profile\NotEnoughGoldToSpendException;
 =======
 use App\Inventory\Equipment;
 use App\Inventory\Inventory;
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+use App\Inventory\Equipment;
+use App\Inventory\Items\Tools\Hammer;
 >>>>>>> Stashed changes
 use App\Position\EntityHitPointsOptions;
 use App\Position\EntityMoveOptions;

@@ -2,6 +2,7 @@
 
 namespace App\Inventory;
 
+<<<<<<< Updated upstream
 
 use App\Exceptions\Profile\TooMuchWeightToCarryException;
 use App\Inventory\Items\Contracts\IInventoryItem;
@@ -20,11 +21,22 @@ class Equipment
         $this->weightCapacity = $weightCapacity;
     }
 
+=======
+use App\Entities\Contracts\IEntity;
+use App\Inventory\Items\Contracts\IGiveGoldIncome;
+use App\Inventory\Items\Contracts\IInventoryItem;
+use App\Inventory\Items\Tools\BaseTool;
+
+class Equipment
+{
+    protected array $equippedItems = [];
+>>>>>>> Stashed changes
     public function all(): array
     {
         return $this->equippedItems;
     }
 
+<<<<<<< Updated upstream
     /**
      * @throws TooMuchWeightToCarryException
      */
@@ -57,3 +69,39 @@ class Equipment
 
 }
 
+=======
+    public function addItem(IInventoryItem $item): void
+    {
+            $this->equippedItems[$item->getName()] = $item;
+            $item->setIsEquipped(true);
+    }
+
+    public function removeItem(IInventoryItem $item): void
+    {
+        unset($this->equippedItems[$item->getName()]);
+    }
+
+    public function getItem(string $inventoryItemName): ?IInventoryItem
+    {
+        return $this->equippedItems[$inventoryItemName] ?? null;
+    }
+
+    public function getItemByType(string $workType): void
+    {
+        foreach ($this->equippedItems as $item) {
+
+            if ($item instanceof IGiveGoldIncome && $item->getWorkType() === $workType ){
+                $item->setIsBeingUsed(true);
+            }
+
+        }
+    }
+
+    public function getWeightProperty(IInventoryItem $item): int
+    {
+        return $item->getWeightValue();
+    }
+
+
+}
+>>>>>>> Stashed changes
